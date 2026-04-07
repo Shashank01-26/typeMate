@@ -14,7 +14,7 @@ The editing toolbar is displayed where content can be added or edited in course 
 - Format text.
 - Insert/edit an image.
 - Insert/edit a link.
-- Paste content.
+- Paste content. Shashank
 - Insert an emoticon.
 - View and edit HTML.
 
