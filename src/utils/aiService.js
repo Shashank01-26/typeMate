@@ -210,17 +210,70 @@ export function analyzeWriting (text) {
   else if (readabilityScore >= 20) readabilityLabel = 'Difficult'
   else readabilityLabel = 'Very Difficult'
 
-  // Simple tone detection based on word patterns
-  const formalWords = ['therefore', 'however', 'furthermore', 'consequently', 'regarding', 'hereby', 'pursuant', 'accordingly']
-  const casualWords = ['hey', 'cool', 'awesome', 'gonna', 'wanna', 'stuff', 'things', 'pretty', 'really', 'super', 'totally']
+  // Multi-signal tone detection
+  const lowerText = plainText.toLowerCase()
+  const lowerWords = words.map(w => w.toLowerCase().replace(/[^a-z']/g, ''))
 
-  const lowerWords = words.map(w => w.toLowerCase())
-  const formalCount = lowerWords.filter(w => formalWords.includes(w)).length
-  const casualCount = lowerWords.filter(w => casualWords.includes(w)).length
+  const formalWords = new Set([
+    'therefore', 'however', 'furthermore', 'consequently', 'regarding',
+    'hereby', 'pursuant', 'accordingly', 'nevertheless', 'notwithstanding',
+    'whereas', 'moreover', 'henceforth', 'thereby', 'wherein', 'thus',
+    'shall', 'ought', 'requisite', 'sufficient', 'additional', 'provide',
+    'ensure', 'appropriate', 'subsequent', 'prior', 'facilitate',
+    'implement', 'significant', 'demonstrate', 'establish', 'constitute',
+    'acknowledge', 'approximately', 'concerning', 'pertaining',
+    'respectively', 'comprehensive', 'considerable', 'substantial',
+    'preliminary', 'fundamental', 'previously', 'particularly',
+    'specifically', 'necessarily', 'essentially', 'indicate', 'obtain',
+    'require', 'utilize', 'commence', 'terminate', 'endeavor'
+  ])
+  const casualWords = new Set([
+    'hey', 'cool', 'awesome', 'gonna', 'wanna', 'stuff', 'things',
+    'pretty', 'really', 'super', 'totally', 'kinda', 'sorta', 'gotta',
+    'yeah', 'yep', 'nope', 'ok', 'okay', 'lol', 'btw', 'omg', 'tbh',
+    'dunno', 'cuz', 'cause', 'literally', 'basically', 'actually',
+    'honestly', 'maybe', 'guess', 'figured', 'bunch', 'tons', 'huge',
+    'crazy', 'insane', 'sick', 'epic', 'dude', 'guys', 'folks',
+    'anyway', 'anyways', 'whatever', 'tho', 'though', 'right',
+    'wow', 'nice', 'great', 'love', 'hate', 'bad', 'good', 'fun',
+    'boring', 'weird', 'like', 'just', 'so', 'very', 'bit'
+  ])
+
+  let formalScore = 0
+  let casualScore = 0
+
+  // Signal 1: keyword matches
+  for (const w of lowerWords) {
+    if (formalWords.has(w)) formalScore += 2
+    if (casualWords.has(w)) casualScore += 2
+  }
+
+  // Signal 2: contractions = casual
+  const contractions = (lowerText.match(/\b\w+n't\b|\b\w+'re\b|\b\w+'ve\b|\b\w+'ll\b|\b\w+'d\b|\bi'm\b|\blet's\b/g) || []).length
+  casualScore += contractions * 1.5
+
+  // Signal 3: exclamation marks = casual, semicolons = formal
+  casualScore += (plainText.match(/!/g) || []).length * 1
+  formalScore += (plainText.match(/;/g) || []).length * 1.5
+
+  // Signal 4: average word length (longer = more formal)
+  const avgWordLen = lowerWords.reduce((s, w) => s + w.length, 0) / Math.max(lowerWords.length, 1)
+  if (avgWordLen > 5.5) formalScore += 2
+  else if (avgWordLen < 4) casualScore += 2
+
+  // Signal 5: long sentences = formal
+  if (avgWordsPerSentence > 20) formalScore += 2
+  else if (avgWordsPerSentence < 10) casualScore += 1.5
+
+  // Signal 6: questions = casual
+  const questionCount = (plainText.match(/\?/g) || []).length
+  if (questionCount >= 2) casualScore += 1.5
 
   let toneIndicator = 'neutral'
-  if (formalCount > casualCount && formalCount >= 2) toneIndicator = 'formal'
-  else if (casualCount > formalCount && casualCount >= 2) toneIndicator = 'casual'
+  const gap = Math.abs(formalScore - casualScore)
+  if (gap >= 2) {
+    toneIndicator = formalScore > casualScore ? 'formal' : 'casual'
+  }
 
   // Reading time
   const minutes = wordCount / 200

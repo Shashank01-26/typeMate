@@ -154,6 +154,7 @@
 			if (savedTheme === 'light') {
 				this.isDark = false
 			}
+			this.updateFavicon()
 
 			setTimeout(() => (app.appLoading = false), 2800)
 			editor = app.$refs.vEditor.quill
@@ -204,6 +205,17 @@
 			toggleTheme: function () {
 				this.isDark = !this.isDark
 				localStorage.setItem('typemate-theme', this.isDark ? 'dark' : 'light')
+				this.updateFavicon()
+			},
+			updateFavicon: function () {
+				const favicon = document.getElementById('favicon')
+				const themeMeta = document.getElementById('theme-color-meta')
+				if (favicon) {
+					favicon.href = this.isDark ? '/img/icons/favicon-dark.svg' : '/img/icons/favicon-light.svg'
+				}
+				if (themeMeta) {
+					themeMeta.content = this.isDark ? '#0B1120' : '#F5F1EB'
+				}
 			},
 			suggestionUp: function () {
 				if (!this.suggestions.length) return true
