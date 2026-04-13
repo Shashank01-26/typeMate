@@ -4,6 +4,21 @@
 		<Logo v-show="appLoading" />
 		<div :class="`smartCompose ${appLoading ? 'loading' : ''}`">
 			<VueEditor ref="vEditor" v-model="editorContent" :editor-toolbar="customToolbar" />
+			<QuickActions
+				:loading="aiLoading"
+				:loadingMessage="aiLoadingMessage"
+				:error="aiError"
+				:aiSuggestions="aiSuggestions"
+				:usage="aiUsage"
+				:activeTone="activeTone"
+				@change-tone="handleChangeTone"
+				@quick-action="handleQuickAction"
+				@improve-grammar="handleImproveGrammar"
+				@get-suggestions="handleGetSuggestions"
+				@apply-suggestion="handleApplySuggestion"
+				@clear-error="aiError = ''"
+			/>
+			<WritingAnalytics :stats="writingStats" :alwaysShow="true" />
 			<div class="footer">
 				<div :class="`suggestionToggle ${suggestionMode === 'sentence' ? '' : 'flip'} ${suggestionLoading ? 'loading' : ''}`"
 					@click="toggleSuggestionMode">
@@ -21,7 +36,10 @@
 	import { VueEditor, Quill } from 'vue2-editor'
 	import SuggestionOverlay from './components/Suggestion.vue'
 	import Logo from './components/Logo.vue'
+	import QuickActions from './components/QuickActions.vue'
+	import WritingAnalytics from './components/WritingAnalytics.vue'
 	import getSuggestions from './utils/suggestionService'
+	import { changeTone, improveGrammar, getContextSuggestions, quickAction, analyzeWriting, getUsageStats } from './utils/aiService'
 
 	let editor
 	const fontList = ['Quicksand', 'Arial', 'Courier', 'Garamond', 'Tahoma', 'Times New Roman', 'Verdana']
@@ -54,12 +72,28 @@
 		data: () => ({
 			appLoading: true,
 			suggestionLoading: true,
-			editorContent: '<p class="ql-font-quicksand"><span class="ql-font-quicksand">Hello There, Welcome to Smart Compose Demo!</span></p>',
+			editorContent: '<p class="ql-font-quicksand"><span class="ql-font-quicksand">Hello There, Welcome to TypeMate - Your AI Writing Assistant!</span></p>',
 			sentences: [],
 			suggestions: [],
 			suggestionMode: 'sentence',
 			suggestionRect: { top: 0, left: 0 },
 			activeEditorState: { suggestion: 0, index: 0 },
+			aiLoading: false,
+			aiLoadingMessage: 'Processing...',
+			aiError: '',
+			aiSuggestions: [],
+			aiUsage: null,
+			activeTone: '',
+			writingStats: {
+				wordCount: 0,
+				charCount: 0,
+				sentenceCount: 0,
+				avgWordsPerSentence: 0,
+				readabilityScore: 0,
+				readabilityLabel: 'N/A',
+				toneIndicator: 'neutral',
+				readingTime: '0 sec'
+			},
 			customToolbar: [
 				[{ font: fonts.whitelist }],
 				[{ header: [false, 1, 2, 3, 4, 5, 6] }],
@@ -114,7 +148,10 @@
 			})
 		},
 		watch: {
-			editorContent: function () {},
+			editorContent: function (val) {
+				this.writingStats = analyzeWriting(val)
+				this.aiSuggestions = []
+			},
 			suggestions: function () {
 				editor.keyboard.addBinding({ key: 'up', handler: this.suggestionUp })
 				editor.keyboard.addBinding({ key: 'down', handler: this.suggestionDown })
@@ -145,9 +182,98 @@
 			},
 			toggleSuggestionMode: function () {
 				this.suggestionMode = this.suggestionMode === 'sentence' ? 'word' : 'sentence'
+			},
+			getSelectedText: function () {
+				const selection = editor.getSelection()
+				if (selection && selection.length > 0) {
+					return { text: editor.getText(selection.index, selection.length), selection }
+				}
+				// Fall back to all text
+				const text = editor.getText().trim()
+				return text ? { text, selection: { index: 0, length: editor.getLength() - 1 } } : null
+			},
+			replaceText: function (newText, selection) {
+				if (selection) {
+					editor.deleteText(selection.index, selection.length)
+					editor.insertText(selection.index, newText)
+					editor.setSelection(selection.index, newText.length)
+				}
+			},
+			updateUsage: function () {
+				this.aiUsage = getUsageStats()
+			},
+			handleChangeTone: async function (tone) {
+				const ctx = this.getSelectedText()
+				if (!ctx) { this.aiError = 'No text to transform. Start writing first!'; return }
+				this.aiLoading = true
+				this.aiLoadingMessage = `Changing tone to ${tone}...`
+				this.aiError = ''
+				this.activeTone = tone
+				try {
+					const result = await changeTone(ctx.text, tone)
+					this.replaceText(result, ctx.selection)
+				} catch (e) {
+					this.aiError = e.message
+				} finally {
+					this.aiLoading = false
+					this.updateUsage()
+				}
+			},
+			handleQuickAction: async function (action) {
+				const ctx = this.getSelectedText()
+				if (!ctx) { this.aiError = 'No text to transform. Start writing first!'; return }
+				this.aiLoading = true
+				this.aiLoadingMessage = `Making text ${action}...`
+				this.aiError = ''
+				try {
+					const result = await quickAction(ctx.text, action)
+					this.replaceText(result, ctx.selection)
+				} catch (e) {
+					this.aiError = e.message
+				} finally {
+					this.aiLoading = false
+					this.updateUsage()
+				}
+			},
+			handleImproveGrammar: async function () {
+				const ctx = this.getSelectedText()
+				if (!ctx) { this.aiError = 'No text to check. Start writing first!'; return }
+				this.aiLoading = true
+				this.aiLoadingMessage = 'Fixing grammar & improving clarity...'
+				this.aiError = ''
+				try {
+					const result = await improveGrammar(ctx.text)
+					this.replaceText(result, ctx.selection)
+				} catch (e) {
+					this.aiError = e.message
+				} finally {
+					this.aiLoading = false
+					this.updateUsage()
+				}
+			},
+			handleGetSuggestions: async function () {
+				const ctx = this.getSelectedText()
+				if (!ctx) { this.aiError = 'No text to analyze. Start writing first!'; return }
+				this.aiLoading = true
+				this.aiLoadingMessage = 'Getting AI suggestions...'
+				this.aiError = ''
+				try {
+					this.aiSuggestions = await getContextSuggestions(ctx.text)
+				} catch (e) {
+					this.aiError = e.message
+				} finally {
+					this.aiLoading = false
+					this.updateUsage()
+				}
+			},
+			handleApplySuggestion: function (suggestion) {
+				const selection = editor.getSelection()
+				const index = selection ? selection.index + selection.length : editor.getLength() - 1
+				editor.insertText(index, ' ' + suggestion)
+				this.aiSuggestions = []
 			}
 		},
-		components: { VueEditor, SuggestionOverlay, Logo }
+		components: { VueEditor, SuggestionOverlay, Logo, QuickActions, WritingAnalytics }
 	}
 </script>
 
