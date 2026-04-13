@@ -1,36 +1,18 @@
 <template>
 	<div class="writing-analytics" v-if="stats.wordCount > 0 || alwaysShow">
 		<div class="analytics-grid">
-			<div class="stat-item">
-				<span class="stat-value">{{ stats.wordCount }}</span>
-				<span class="stat-label">Words</span>
-			</div>
-			<div class="stat-item">
-				<span class="stat-value">{{ stats.charCount }}</span>
-				<span class="stat-label">Characters</span>
-			</div>
-			<div class="stat-item">
-				<span class="stat-value">{{ stats.sentenceCount }}</span>
-				<span class="stat-label">Sentences</span>
-			</div>
-			<div class="stat-item">
-				<span class="stat-value">{{ stats.readingTime }}</span>
-				<span class="stat-label">Read Time</span>
-			</div>
-			<div class="stat-item">
-				<span class="stat-value" :class="readabilityClass">{{ stats.readabilityScore }}</span>
-				<span class="stat-label">Readability</span>
-			</div>
-			<div class="stat-item">
-				<span class="stat-value tone-badge" :class="'tone-' + stats.toneIndicator">{{ stats.toneIndicator }}</span>
-				<span class="stat-label">Tone</span>
+			<div class="stat-item" v-for="stat in displayStats" :key="stat.label">
+				<span class="stat-value" :class="stat.class || ''">{{ stat.value }}</span>
+				<span class="stat-label">{{ stat.label }}</span>
 			</div>
 		</div>
-		<div class="readability-bar">
-			<div class="bar-track">
-				<div class="bar-fill" :style="{ width: stats.readabilityScore + '%' }" :class="readabilityClass"></div>
+		<div class="readability-row">
+			<div class="readability-bar">
+				<div class="bar-track">
+					<div class="bar-fill" :style="{ width: stats.readabilityScore + '%' }" :class="readabilityClass"></div>
+				</div>
 			</div>
-			<span class="bar-label">{{ stats.readabilityLabel }}</span>
+			<span class="readability-label" :class="readabilityClass">{{ stats.readabilityLabel }}</span>
 		</div>
 	</div>
 </template>
@@ -39,20 +21,24 @@
 	export default {
 		name: 'WritingAnalytics',
 		props: {
-			stats: {
-				type: Object,
-				required: true
-			},
-			alwaysShow: {
-				type: Boolean,
-				default: false
-			}
+			stats: { type: Object, required: true },
+			alwaysShow: { type: Boolean, default: false }
 		},
 		computed: {
 			readabilityClass () {
 				if (this.stats.readabilityScore >= 60) return 'good'
 				if (this.stats.readabilityScore >= 40) return 'moderate'
 				return 'difficult'
+			},
+			displayStats () {
+				return [
+					{ value: this.stats.wordCount, label: 'Words' },
+					{ value: this.stats.charCount, label: 'Chars' },
+					{ value: this.stats.sentenceCount, label: 'Sentences' },
+					{ value: this.stats.readingTime, label: 'Read' },
+					{ value: this.stats.readabilityScore, label: 'Score', class: this.readabilityClass },
+					{ value: this.stats.toneIndicator, label: 'Tone', class: 'tone tone-' + this.stats.toneIndicator }
+				]
 			}
 		}
 	}
@@ -60,82 +46,101 @@
 
 <style lang="scss" scoped>
 .writing-analytics {
-  width: 100%;
-  padding: 8px 16px;
-  background: #f8f7ff;
-  border-top: 1px solid rgba(var(--colorAccentRGB), 0.15);
+	width: 100%;
+	padding: 8px 20px 6px;
+	background: var(--analyticsBar);
+	border-top: 1px solid var(--border);
 
-  .analytics-grid {
-    display: flex;
-    justify-content: space-around;
-    gap: 8px;
-    margin-bottom: 6px;
+	.analytics-grid {
+		display: flex;
+		justify-content: space-between;
+		gap: 4px;
+		margin-bottom: 5px;
 
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
+		.stat-item {
+			display: flex;
+			align-items: center;
+			gap: 5px;
 
-      .stat-value {
-        font-size: 14px;
-        font-weight: 600;
-        color: #333;
-        text-transform: capitalize;
+			.stat-value {
+				font-family: 'Source Sans 3', sans-serif;
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--textPrimary);
+				text-transform: capitalize;
 
-        &.good { color: #22c55e; }
-        &.moderate { color: #f59e0b; }
-        &.difficult { color: #ef4444; }
-      }
+				&.good { color: var(--success); }
+				&.moderate { color: var(--warning); }
+				&.difficult { color: var(--error); }
 
-      .tone-badge {
-        font-size: 11px;
-        padding: 1px 8px;
-        border-radius: 999px;
-        color: white;
+				&.tone {
+					font-size: 11px;
+					padding: 1px 10px;
+					border-radius: 4px;
+					font-weight: 500;
+					letter-spacing: 0.3px;
+				}
+				&.tone-formal {
+					background: var(--accentSoft);
+					color: var(--accent);
+				}
+				&.tone-casual {
+					background: var(--warningSoft);
+					color: var(--warning);
+				}
+				&.tone-neutral {
+					background: var(--border);
+					color: var(--textMuted);
+				}
+			}
 
-        &.tone-formal { background: #6366f1; }
-        &.tone-casual { background: #f59e0b; }
-        &.tone-neutral { background: #94a3b8; }
-      }
+			.stat-label {
+				font-family: 'Source Sans 3', sans-serif;
+				font-size: 10.5px;
+				font-weight: 500;
+				color: var(--textMuted);
+				text-transform: uppercase;
+				letter-spacing: 0.8px;
+			}
+		}
+	}
 
-      .stat-label {
-        font-size: 10px;
-        color: #888;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-    }
-  }
+	.readability-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
 
-  .readability-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+		.readability-bar {
+			flex: 1;
+			.bar-track {
+				height: 3px;
+				background: var(--border);
+				border-radius: 3px;
+				overflow: hidden;
 
-    .bar-track {
-      flex: 1;
-      height: 4px;
-      background: #e2e8f0;
-      border-radius: 2px;
-      overflow: hidden;
+				.bar-fill {
+					height: 100%;
+					border-radius: 3px;
+					transition: width 0.4s ease;
+					&.good { background: var(--success); }
+					&.moderate { background: var(--warning); }
+					&.difficult { background: var(--error); }
+				}
+			}
+		}
 
-      .bar-fill {
-        height: 100%;
-        border-radius: 2px;
-        transition: width 0.3s ease;
+		.readability-label {
+			font-family: 'Source Sans 3', sans-serif;
+			font-size: 10px;
+			font-weight: 600;
+			letter-spacing: 0.5px;
+			white-space: nowrap;
+			text-transform: uppercase;
 
-        &.good { background: #22c55e; }
-        &.moderate { background: #f59e0b; }
-        &.difficult { background: #ef4444; }
-      }
-    }
-
-    .bar-label {
-      font-size: 10px;
-      color: #666;
-      white-space: nowrap;
-    }
-  }
+			&.good { color: var(--success); }
+			&.moderate { color: var(--warning); }
+			&.difficult { color: var(--error); }
+		}
+	}
 }
 </style>
