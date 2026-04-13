@@ -8,18 +8,16 @@
 					:class="{ active: activeTone === tone.value }"
 					:disabled="loading"
 					@click="$emit('change-tone', tone.value)">
-					<span class="btn-icon">{{ tone.icon }}</span>
 					{{ tone.label }}
 				</button>
 			</div>
 			<div class="divider"></div>
 			<div class="action-group">
-				<span class="group-label">Quick Actions</span>
+				<span class="group-label">Quick</span>
 				<button v-for="action in actions" :key="action.value"
 					class="action-btn quick-btn"
 					:disabled="loading"
 					@click="$emit('quick-action', action.value)">
-					<span class="btn-icon">{{ action.icon }}</span>
 					{{ action.label }}
 				</button>
 			</div>
@@ -38,8 +36,8 @@
 		</div>
 
 		<div v-if="loading" class="loading-indicator">
-			<div class="loading-dots">
-				<span></span><span></span><span></span>
+			<div class="loading-bar">
+				<div class="loading-bar-fill"></div>
 			</div>
 			<span class="loading-text">{{ loadingMessage }}</span>
 		</div>
@@ -81,16 +79,16 @@
 		data () {
 			return {
 				tones: [
-					{ label: 'Formal', value: 'formal', icon: '\u2727' },
-					{ label: 'Casual', value: 'casual', icon: '\u263A' },
-					{ label: 'Academic', value: 'academic', icon: '\u2736' },
-					{ label: 'Creative', value: 'creative', icon: '\u270E' }
+					{ label: 'Formal', value: 'formal' },
+					{ label: 'Casual', value: 'casual' },
+					{ label: 'Academic', value: 'academic' },
+					{ label: 'Creative', value: 'creative' }
 				],
 				actions: [
-					{ label: 'Concise', value: 'concise', icon: '\u2702' },
-					{ label: 'Professional', value: 'professional', icon: '\u2606' },
-					{ label: 'Simplify', value: 'simplify', icon: '\u25CB' },
-					{ label: 'Expand', value: 'expand', icon: '\u2295' }
+					{ label: 'Concise', value: 'concise' },
+					{ label: 'Professional', value: 'professional' },
+					{ label: 'Simplify', value: 'simplify' },
+					{ label: 'Expand', value: 'expand' }
 				]
 			}
 		},
@@ -118,12 +116,12 @@
 	.actions-row {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
 		flex-wrap: wrap;
 
 		.divider {
 			width: 1px;
-			height: 24px;
+			height: 22px;
 			background: var(--border);
 			flex-shrink: 0;
 		}
@@ -135,12 +133,12 @@
 			flex-wrap: wrap;
 
 			.group-label {
-				font-family: 'Cormorant Garamond', Georgia, serif;
-				font-size: 12px;
-				font-weight: 600;
-				color: var(--textMuted);
+				font-family: 'Outfit', sans-serif;
+				font-size: 10px;
+				font-weight: 700;
+				color: var(--accent);
 				text-transform: uppercase;
-				letter-spacing: 1.5px;
+				letter-spacing: 2px;
 				margin-right: 4px;
 			}
 		}
@@ -152,45 +150,39 @@
 		border-radius: 6px;
 		background: var(--surface);
 		color: var(--textSecondary);
-		font-family: 'Source Sans 3', sans-serif;
-		font-size: 12.5px;
+		font-family: 'DM Sans', sans-serif;
+		font-size: 12px;
 		font-weight: 500;
 		cursor: pointer;
 		transition: all 0.2s ease;
 		white-space: nowrap;
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-
-		.btn-icon {
-			font-size: 11px;
-			opacity: 0.7;
-		}
+		position: relative;
 
 		&:hover:not(:disabled) {
-			background: var(--accentSoft);
 			border-color: var(--accent);
 			color: var(--accent);
+			background: var(--accentSoft);
+			box-shadow: 0 0 12px var(--glowSoft);
 			transform: translateY(-1px);
-			box-shadow: 0 2px 8px var(--shadowLight);
 		}
 
 		&:active:not(:disabled) {
 			transform: translateY(0);
 			background: var(--accent);
-			color: white;
+			color: var(--accentContrast);
+			box-shadow: 0 0 20px var(--glowMedium);
 		}
 
 		&:disabled {
-			opacity: 0.45;
+			opacity: 0.4;
 			cursor: not-allowed;
 		}
 
 		&.active {
 			background: var(--accent);
-			color: white;
+			color: var(--accentContrast);
 			border-color: var(--accent);
-			box-shadow: 0 2px 8px var(--shadowAccent);
+			box-shadow: 0 0 16px var(--glowMedium), inset 0 0 8px rgba(255,255,255,0.1);
 		}
 
 		&.grammar-btn {
@@ -198,16 +190,16 @@
 			color: var(--success);
 			&:hover:not(:disabled) {
 				background: var(--successSoft);
-				border-color: var(--success);
+				box-shadow: 0 0 12px rgba(0, 220, 130, 0.15);
 			}
 		}
 
 		&.suggest-btn {
-			border-color: var(--accentBorder);
-			color: var(--accent);
+			border-color: var(--purpleBorder);
+			color: var(--purple);
 			&:hover:not(:disabled) {
-				background: var(--accentSoft);
-				border-color: var(--accent);
+				background: var(--purpleSoft);
+				box-shadow: 0 0 12px rgba(123, 97, 255, 0.15);
 			}
 		}
 	}
@@ -215,32 +207,34 @@
 	.loading-indicator {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 		margin-top: 10px;
 		padding: 8px 14px;
 		background: var(--accentSoft);
 		border-radius: 8px;
 		border: 1px solid var(--accentBorder);
 
-		.loading-dots {
-			display: flex;
-			gap: 4px;
-			span {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-				background: var(--accent);
-				animation: dotBounce 1.2s ease-in-out infinite;
-				&:nth-child(2) { animation-delay: 0.15s; }
-				&:nth-child(3) { animation-delay: 0.3s; }
+		.loading-bar {
+			width: 40px;
+			height: 3px;
+			border-radius: 3px;
+			background: var(--border);
+			overflow: hidden;
+			flex-shrink: 0;
+
+			.loading-bar-fill {
+				width: 40%;
+				height: 100%;
+				background: linear-gradient(90deg, var(--accent), var(--purple));
+				border-radius: 3px;
+				animation: loadingSlide 1s ease-in-out infinite;
 			}
 		}
 
 		.loading-text {
-			font-family: 'Source Sans 3', sans-serif;
-			font-size: 13px;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 12.5px;
 			color: var(--textSecondary);
-			font-style: italic;
 		}
 	}
 
@@ -250,20 +244,18 @@
 		background: var(--errorSoft);
 		border: 1px solid var(--errorBorder);
 		border-radius: 8px;
-		font-family: 'Source Sans 3', sans-serif;
-		font-size: 13px;
+		font-family: 'DM Sans', sans-serif;
+		font-size: 12.5px;
 		color: var(--error);
 		cursor: pointer;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		transition: opacity 0.2s;
 
 		.dismiss {
 			font-size: 11px;
 			color: var(--textMuted);
-			text-decoration: underline;
-			text-underline-offset: 2px;
+			opacity: 0.7;
 		}
 	}
 
@@ -271,12 +263,12 @@
 		margin-top: 10px;
 
 		.suggestions-label {
-			font-family: 'Cormorant Garamond', Georgia, serif;
-			font-size: 12px;
-			font-weight: 600;
-			color: var(--textMuted);
+			font-family: 'Outfit', sans-serif;
+			font-size: 10px;
+			font-weight: 700;
+			color: var(--accent);
 			text-transform: uppercase;
-			letter-spacing: 1.5px;
+			letter-spacing: 2px;
 		}
 
 		.ai-suggestion-item {
@@ -285,8 +277,8 @@
 			background: var(--surface);
 			border: 1px solid var(--border);
 			border-radius: 8px;
-			font-family: 'Source Sans 3', sans-serif;
-			font-size: 13.5px;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 13px;
 			color: var(--textPrimary);
 			cursor: pointer;
 			transition: all 0.2s ease;
@@ -299,7 +291,7 @@
 				flex-shrink: 0;
 				width: 20px;
 				height: 20px;
-				border-radius: 50%;
+				border-radius: 5px;
 				background: var(--accentSoft);
 				color: var(--accent);
 				font-size: 11px;
@@ -311,8 +303,8 @@
 			}
 
 			&:hover {
-				background: var(--accentSoft);
 				border-color: var(--accent);
+				box-shadow: 0 0 12px var(--glowSoft);
 				transform: translateX(4px);
 			}
 		}
@@ -325,12 +317,11 @@
 		gap: 10px;
 
 		.usage-text {
-			font-family: 'Source Sans 3', sans-serif;
-			font-size: 11px;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 10.5px;
 			font-weight: 500;
 			color: var(--textMuted);
 			white-space: nowrap;
-			letter-spacing: 0.5px;
 		}
 
 		.usage-track {
@@ -344,16 +335,16 @@
 				height: 100%;
 				border-radius: 3px;
 				transition: width 0.4s ease;
-				&.normal { background: var(--success); }
-				&.warning { background: var(--warning); }
-				&.critical { background: var(--error); }
+				&.normal { background: var(--success); box-shadow: 0 0 6px rgba(0, 220, 130, 0.3); }
+				&.warning { background: var(--warning); box-shadow: 0 0 6px rgba(255, 184, 0, 0.3); }
+				&.critical { background: var(--error); box-shadow: 0 0 6px rgba(255, 75, 75, 0.3); }
 			}
 		}
 	}
 
-	@keyframes dotBounce {
-		0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-		40% { transform: scale(1); opacity: 1; }
+	@keyframes loadingSlide {
+		0% { transform: translateX(-100%); }
+		100% { transform: translateX(300%); }
 	}
 }
 </style>

@@ -63,22 +63,22 @@
 			gap: 5px;
 
 			.stat-value {
-				font-family: 'Source Sans 3', sans-serif;
+				font-family: 'Outfit', sans-serif;
 				font-size: 13px;
 				font-weight: 600;
 				color: var(--textPrimary);
 				text-transform: capitalize;
 
-				&.good { color: var(--success); }
-				&.moderate { color: var(--warning); }
-				&.difficult { color: var(--error); }
+				&.good { color: var(--success); text-shadow: 0 0 8px rgba(0, 220, 130, 0.3); }
+				&.moderate { color: var(--warning); text-shadow: 0 0 8px rgba(255, 184, 0, 0.3); }
+				&.difficult { color: var(--error); text-shadow: 0 0 8px rgba(255, 75, 75, 0.3); }
 
 				&.tone {
+					font-family: 'DM Sans', sans-serif;
 					font-size: 11px;
 					padding: 1px 10px;
 					border-radius: 4px;
 					font-weight: 500;
-					letter-spacing: 0.3px;
 				}
 				&.tone-formal {
 					background: var(--accentSoft);
@@ -95,8 +95,8 @@
 			}
 
 			.stat-label {
-				font-family: 'Source Sans 3', sans-serif;
-				font-size: 10.5px;
+				font-family: 'DM Sans', sans-serif;
+				font-size: 10px;
 				font-weight: 500;
 				color: var(--textMuted);
 				text-transform: uppercase;
@@ -122,15 +122,15 @@
 					height: 100%;
 					border-radius: 3px;
 					transition: width 0.4s ease;
-					&.good { background: var(--success); }
-					&.moderate { background: var(--warning); }
-					&.difficult { background: var(--error); }
+					&.good { background: var(--success); box-shadow: 0 0 6px rgba(0, 220, 130, 0.3); }
+					&.moderate { background: var(--warning); box-shadow: 0 0 6px rgba(255, 184, 0, 0.3); }
+					&.difficult { background: var(--error); box-shadow: 0 0 6px rgba(255, 75, 75, 0.3); }
 				}
 			}
 		}
 
 		.readability-label {
-			font-family: 'Source Sans 3', sans-serif;
+			font-family: 'Outfit', sans-serif;
 			font-size: 10px;
 			font-weight: 600;
 			letter-spacing: 0.5px;

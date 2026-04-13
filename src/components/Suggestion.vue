@@ -19,17 +19,17 @@
 	$radius: 8px;
 
 	position: fixed;
-	background: var(--accent);
 	border-radius: $radius;
 	border: 1px solid var(--accent);
 	display: flex;
-	box-shadow: 0 8px 30px var(--shadowAccent), 0 2px 8px var(--shadowLight);
+	box-shadow: 0 8px 32px var(--glowMedium), 0 0 1px var(--accent);
 	flex-direction: column;
 	transform-origin: 50% 0;
 	user-select: none;
 	transition: all 0.15s ease-out;
 	z-index: 100;
-	backdrop-filter: blur(10px);
+	backdrop-filter: blur(12px);
+	overflow: hidden;
 
 	> span {
 		min-width: 180px;
@@ -37,8 +37,8 @@
 		background: var(--surface);
 		border-bottom: 1px solid var(--border);
 		color: var(--textPrimary);
-		font-family: 'Source Sans 3', sans-serif;
-		font-size: 13.5px;
+		font-family: 'DM Sans', sans-serif;
+		font-size: 13px;
 		cursor: pointer;
 		transition: all 0.12s ease;
 
@@ -46,14 +46,11 @@
 			background: var(--accentSoft);
 			color: var(--accent);
 		}
-		&:active {
-			background: var(--accent);
-			color: white;
-		}
 
 		&.active {
 			background: var(--accent);
-			color: white;
+			color: var(--accentContrast);
+			text-shadow: 0 0 10px rgba(255,255,255,0.2);
 		}
 
 		&:first-of-type {

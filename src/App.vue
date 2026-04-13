@@ -5,15 +5,21 @@
 			<!-- Header bar -->
 			<div class="shell-header">
 				<div class="header-brand">
-					<svg class="brand-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M44 8L56 20L24 52L8 56L12 40L44 8Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M36 16L48 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+					<svg class="brand-icon" viewBox="0 0 80 100" fill="none">
+						<path d="M48 4L12 56H36L28 96L68 40H44L48 4Z" fill="url(#brandGrad)"/>
+						<defs>
+							<linearGradient id="brandGrad" x1="12" y1="4" x2="68" y2="96" gradientUnits="userSpaceOnUse">
+								<stop offset="0" stop-color="#00D4FF"/>
+								<stop offset="1" stop-color="#7B61FF"/>
+							</linearGradient>
+						</defs>
 					</svg>
-					<span class="brand-name">TypeMate</span>
+					<span class="brand-name">Type<span class="brand-accent">Mate</span></span>
 				</div>
 				<div class="header-controls">
-					<div :class="['modeToggle', { flip: suggestionMode === 'word' }, { loading: suggestionLoading }]"
+					<div :class="['modeToggle', { active: suggestionMode === 'word' }, { loading: suggestionLoading }]"
 						@click="toggleSuggestionMode">
+						<span class="toggle-indicator"></span>
 						<span class="toggle-label">{{ suggestionLoading ? 'Loading...' : (suggestionMode === 'sentence' ? 'Sentence' : 'Word') }}</span>
 					</div>
 					<button class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
@@ -99,7 +105,7 @@
 		data: () => ({
 			appLoading: true,
 			suggestionLoading: true,
-			isDark: false,
+			isDark: true,
 			editorContent: '<p class="ql-font-quicksand"><span class="ql-font-quicksand">Hello There, Welcome to TypeMate \u2014 Your AI Writing Assistant!</span></p>',
 			sentences: [],
 			suggestions: [],
@@ -143,13 +149,12 @@
 		async mounted () {
 			const app = this
 
-			// Restore theme preference
 			const savedTheme = localStorage.getItem('typemate-theme')
-			if (savedTheme === 'dark') {
-				this.isDark = true
+			if (savedTheme === 'light') {
+				this.isDark = false
 			}
 
-			setTimeout(() => (app.appLoading = false), 2600)
+			setTimeout(() => (app.appLoading = false), 2800)
 			editor = app.$refs.vEditor.quill
 			let suggestionService
 
@@ -316,110 +321,107 @@
 </script>
 
 <style lang="scss">
-	/* ===== FONTS ===== */
 	@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap');
 
-	/* ===== LIGHT THEME (Warm Study) ===== */
+	/* ===== DARK THEME (Voltage - Default) ===== */
 	.typemateApp {
-		--accent: #B8860B;
-		--accentWarm: #C4A882;
-		--accentSoft: rgba(184, 134, 11, 0.08);
-		--accentBorder: rgba(184, 134, 11, 0.25);
-		--shadowAccent: rgba(184, 134, 11, 0.15);
-		--shadowLight: rgba(0, 0, 0, 0.06);
-		--shadowMedium: rgba(0, 0, 0, 0.1);
+		--accent: #00D4FF;
+		--accentContrast: #0A0E1A;
+		--purple: #7B61FF;
+		--accentSoft: rgba(0, 212, 255, 0.08);
+		--accentBorder: rgba(0, 212, 255, 0.2);
+		--purpleSoft: rgba(123, 97, 255, 0.08);
+		--purpleBorder: rgba(123, 97, 255, 0.2);
+		--glowSoft: rgba(0, 212, 255, 0.1);
+		--glowMedium: rgba(0, 212, 255, 0.2);
+		--glowStrong: rgba(0, 212, 255, 0.35);
+		--shadowLight: rgba(0, 0, 0, 0.2);
+		--shadowMedium: rgba(0, 0, 0, 0.4);
 
-		--bg: #F5F0E8;
-		--bgGrain: rgba(0, 0, 0, 0.015);
-		--surface: #FFFDF8;
-		--surfaceElevated: #FBF8F2;
-		--splashBg: #F5F0E8;
+		--bg: #0A0E1A;
+		--surface: #111827;
+		--surfaceElevated: #151C2E;
+		--splashBg: #0A0E1A;
 
-		--textPrimary: #2C2418;
-		--textSecondary: #5C4E3C;
-		--textMuted: #9B8E7B;
+		--textPrimary: #E8ECF4;
+		--textSecondary: #94A3B8;
+		--textMuted: #4B5B73;
 
-		--border: rgba(44, 36, 24, 0.1);
-		--borderStrong: rgba(44, 36, 24, 0.18);
+		--border: rgba(148, 163, 184, 0.1);
+		--borderStrong: rgba(148, 163, 184, 0.15);
 
-		--toolbarBg: #FFFDF8;
-		--toolbarIcon: #5C4E3C;
-		--toolbarIconHover: #B8860B;
+		--toolbarBg: #111827;
+		--toolbarIcon: #64748B;
+		--toolbarIconHover: #00D4FF;
 
-		--editorBg: #FFFDF8;
-		--editorShadow: inset 0 0 12px 0px rgba(44, 36, 24, 0.08);
+		--editorBg: #0D1221;
+		--analyticsBar: #0F1525;
 
-		--analyticsBar: #F9F5EE;
+		--success: #00DC82;
+		--successSoft: rgba(0, 220, 130, 0.08);
+		--successBorder: rgba(0, 220, 130, 0.2);
+		--warning: #FFB800;
+		--warningSoft: rgba(255, 184, 0, 0.08);
+		--error: #FF4B4B;
+		--errorSoft: rgba(255, 75, 75, 0.06);
+		--errorBorder: rgba(255, 75, 75, 0.15);
 
-		--success: #5A8A3C;
-		--successSoft: rgba(90, 138, 60, 0.08);
-		--successBorder: rgba(90, 138, 60, 0.25);
-		--warning: #C4882B;
-		--warningSoft: rgba(196, 136, 43, 0.08);
-		--error: #B54A3C;
-		--errorSoft: rgba(181, 74, 60, 0.06);
-		--errorBorder: rgba(181, 74, 60, 0.2);
-
-		--headerBg: #FFFDF8;
-		--headerBorder: rgba(44, 36, 24, 0.08);
-
-		--toggleBg: var(--accent);
-		--toggleText: white;
+		--headerBg: #111827;
+		--headerBorder: rgba(0, 212, 255, 0.08);
 	}
 
-	/* ===== DARK THEME (Warm Evening) ===== */
-	.typemateApp.dark {
-		--accent: #D4A745;
-		--accentWarm: #C4A882;
-		--accentSoft: rgba(212, 167, 69, 0.1);
-		--accentBorder: rgba(212, 167, 69, 0.25);
-		--shadowAccent: rgba(212, 167, 69, 0.12);
-		--shadowLight: rgba(0, 0, 0, 0.15);
-		--shadowMedium: rgba(0, 0, 0, 0.3);
+	/* ===== LIGHT THEME (Voltage Light) ===== */
+	.typemateApp:not(.dark) {
+		--accent: #0891B2;
+		--accentContrast: #FFFFFF;
+		--purple: #6D28D9;
+		--accentSoft: rgba(8, 145, 178, 0.06);
+		--accentBorder: rgba(8, 145, 178, 0.2);
+		--purpleSoft: rgba(109, 40, 217, 0.06);
+		--purpleBorder: rgba(109, 40, 217, 0.2);
+		--glowSoft: rgba(8, 145, 178, 0.08);
+		--glowMedium: rgba(8, 145, 178, 0.12);
+		--glowStrong: rgba(8, 145, 178, 0.2);
+		--shadowLight: rgba(0, 0, 0, 0.05);
+		--shadowMedium: rgba(0, 0, 0, 0.08);
 
-		--bg: #1C1914;
-		--bgGrain: rgba(255, 255, 255, 0.01);
-		--surface: #262219;
-		--surfaceElevated: #2C271E;
-		--splashBg: #1C1914;
+		--bg: #F0F4F8;
+		--surface: #FFFFFF;
+		--surfaceElevated: #F7F9FC;
+		--splashBg: #F0F4F8;
 
-		--textPrimary: #E8E0D2;
-		--textSecondary: #B5A998;
-		--textMuted: #786D5E;
+		--textPrimary: #0F172A;
+		--textSecondary: #475569;
+		--textMuted: #94A3B8;
 
-		--border: rgba(232, 224, 210, 0.08);
-		--borderStrong: rgba(232, 224, 210, 0.14);
+		--border: rgba(15, 23, 42, 0.08);
+		--borderStrong: rgba(15, 23, 42, 0.12);
 
-		--toolbarBg: #262219;
-		--toolbarIcon: #B5A998;
-		--toolbarIconHover: #D4A745;
+		--toolbarBg: #FFFFFF;
+		--toolbarIcon: #64748B;
+		--toolbarIconHover: #0891B2;
 
-		--editorBg: #22201A;
-		--editorShadow: inset 0 0 12px 0px rgba(0, 0, 0, 0.3);
+		--editorBg: #FFFFFF;
+		--analyticsBar: #F7F9FC;
 
-		--analyticsBar: #232019;
+		--success: #059669;
+		--successSoft: rgba(5, 150, 105, 0.06);
+		--successBorder: rgba(5, 150, 105, 0.2);
+		--warning: #D97706;
+		--warningSoft: rgba(217, 119, 6, 0.06);
+		--error: #DC2626;
+		--errorSoft: rgba(220, 38, 38, 0.04);
+		--errorBorder: rgba(220, 38, 38, 0.12);
 
-		--success: #7AAF56;
-		--successSoft: rgba(122, 175, 86, 0.1);
-		--successBorder: rgba(122, 175, 86, 0.2);
-		--warning: #D4A745;
-		--warningSoft: rgba(212, 167, 69, 0.1);
-		--error: #D46B5C;
-		--errorSoft: rgba(212, 107, 92, 0.08);
-		--errorBorder: rgba(212, 107, 92, 0.2);
-
-		--headerBg: #262219;
-		--headerBorder: rgba(232, 224, 210, 0.06);
-
-		--toggleBg: var(--accent);
-		--toggleText: #1C1914;
+		--headerBg: #FFFFFF;
+		--headerBorder: rgba(8, 145, 178, 0.08);
 	}
 
 	/* ===== BASE RESET ===== */
 	html, body {
 		width: 100%;
 		height: 100%;
-		font-family: 'Source Sans 3', 'Quicksand', Helvetica, Arial, sans-serif;
+		font-family: 'DM Sans', 'Quicksand', Helvetica, Arial, sans-serif;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		display: flex;
@@ -435,13 +437,8 @@
 	}
 
 	body {
-		background: #F5F0E8;
-		transition: background 0.35s ease;
-	}
-
-	.typemateApp.dark ~ body,
-	.typemateApp.dark {
-		body { background: #1C1914; }
+		background: #0A0E1A;
+		transition: background 0.4s ease;
 	}
 
 	/* ===== APP SHELL ===== */
@@ -454,21 +451,49 @@
 		align-items: center;
 		overflow: hidden;
 		background: var(--bg);
-		transition: background 0.35s ease;
+		transition: background 0.4s ease;
 
-		/* Subtle grain texture on background */
+		/* Grid pattern background */
 		&::before {
 			content: '';
 			position: absolute;
 			inset: 0;
-			background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+			background-image:
+				linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+			background-size: 40px 40px;
 			pointer-events: none;
 			z-index: 0;
 		}
 
+		&:not(.dark)::before {
+			background-image:
+				linear-gradient(rgba(8, 145, 178, 0.03) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(8, 145, 178, 0.03) 1px, transparent 1px);
+		}
+
+		/* Corner glow effect */
+		&::after {
+			content: '';
+			position: absolute;
+			width: 500px;
+			height: 500px;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(0, 212, 255, 0.06), transparent 70%);
+			top: -200px;
+			right: -150px;
+			pointer-events: none;
+			z-index: 0;
+			animation: cornerGlow 8s ease-in-out infinite;
+		}
+
+		&:not(.dark)::after {
+			background: radial-gradient(circle, rgba(8, 145, 178, 0.04), transparent 70%);
+		}
+
 		/* ===== EDITOR SHELL ===== */
 		.editorShell {
-			$duration: 0.4s;
+			$duration: 0.45s;
 
 			position: relative;
 			width: min(96%, 1100px);
@@ -479,8 +504,8 @@
 			border: 1px solid var(--borderStrong);
 			border-radius: 16px;
 			box-shadow:
-				0 4px 24px var(--shadowLight),
-				0 1px 4px var(--shadowLight);
+				0 4px 30px var(--shadowLight),
+				0 0 1px var(--borderStrong);
 			overflow: hidden;
 			z-index: 1;
 			transition: all $duration cubic-bezier(0.16, 1, 0.3, 1);
@@ -509,48 +534,79 @@
 					gap: 10px;
 
 					.brand-icon {
-						width: 24px;
-						height: 24px;
-						color: var(--accent);
+						width: 20px;
+						height: 25px;
+						filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.3));
 					}
 
 					.brand-name {
-						font-family: 'Cormorant Garamond', Georgia, serif;
+						font-family: 'Outfit', sans-serif;
 						font-size: 20px;
-						font-weight: 600;
+						font-weight: 700;
 						color: var(--textPrimary);
-						letter-spacing: 0.5px;
+						letter-spacing: 1px;
+
+						.brand-accent {
+							background: linear-gradient(135deg, #00D4FF, #7B61FF);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							background-clip: text;
+						}
 					}
 				}
 
 				.header-controls {
 					display: flex;
 					align-items: center;
-					gap: 12px;
+					gap: 10px;
 
 					.modeToggle {
-						padding: 4px 16px;
-						background: var(--accent);
-						color: var(--toggleText);
-						border-radius: 6px;
-						font-family: 'Source Sans 3', sans-serif;
-						font-size: 12px;
-						font-weight: 600;
-						letter-spacing: 0.5px;
+						position: relative;
+						padding: 5px 16px 5px 24px;
+						background: var(--surfaceElevated);
+						border: 1px solid var(--border);
+						border-radius: 20px;
 						cursor: pointer;
 						user-select: none;
-						transition: all 0.2s ease;
+						transition: all 0.25s ease;
+
+						.toggle-indicator {
+							position: absolute;
+							left: 8px;
+							top: 50%;
+							transform: translateY(-50%);
+							width: 8px;
+							height: 8px;
+							border-radius: 50%;
+							background: var(--accent);
+							box-shadow: 0 0 8px var(--glowMedium);
+							transition: all 0.25s ease;
+						}
+
+						.toggle-label {
+							font-family: 'DM Sans', sans-serif;
+							font-size: 12px;
+							font-weight: 500;
+							color: var(--textSecondary);
+							transition: color 0.2s;
+						}
 
 						&:hover {
-							box-shadow: 0 2px 10px var(--shadowAccent);
-							transform: translateY(-1px);
+							border-color: var(--accent);
+							box-shadow: 0 0 12px var(--glowSoft);
 						}
-						&:active {
-							transform: translateY(0);
+
+						&.active .toggle-indicator {
+							background: var(--purple);
+							box-shadow: 0 0 8px rgba(123, 97, 255, 0.4);
 						}
+
 						&.loading {
-							opacity: 0.6;
+							opacity: 0.5;
 							pointer-events: none;
+							.toggle-indicator {
+								animation: indicatorPulse 1s ease-in-out infinite;
+							}
 						}
 					}
 
@@ -568,25 +624,26 @@
 						padding: 0;
 
 						.theme-icon {
-							width: 18px;
-							height: 18px;
+							width: 17px;
+							height: 17px;
 							color: var(--accent);
-							transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+							transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 						}
 
 						&:hover {
-							background: var(--accentSoft);
 							border-color: var(--accent);
-							box-shadow: 0 2px 10px var(--shadowAccent);
+							box-shadow: 0 0 14px var(--glowMedium);
+							background: var(--accentSoft);
 							.theme-icon {
-								transform: rotate(25deg) scale(1.1);
+								transform: rotate(20deg) scale(1.1);
+								filter: drop-shadow(0 0 4px var(--accent));
 							}
 						}
 					}
 				}
 			}
 
-			/* ===== QUILL EDITOR OVERRIDES ===== */
+			/* ===== QUILL EDITOR ===== */
 			> .quillWrapper {
 				position: relative;
 				width: 100%;
@@ -596,7 +653,7 @@
 				display: flex;
 				flex-direction: column;
 				overflow: hidden;
-				transition: background 0.35s ease;
+				transition: background 0.4s ease;
 
 				> .ql-toolbar {
 					$radius: 8px;
@@ -604,50 +661,45 @@
 					text-align: center;
 					border: none !important;
 					border-bottom: 1px solid var(--border) !important;
-					padding: 12px 12px 10px !important;
+					padding: 10px 12px 8px !important;
 					background: var(--toolbarBg);
-					transition: background 0.35s ease, border-color 0.35s ease;
+					transition: all 0.4s ease;
 
-					/* Style all toolbar buttons */
 					.ql-formats {
-						margin-right: 8px !important;
+						margin-right: 6px !important;
 
 						button {
-							width: 30px !important;
-							height: 30px !important;
+							width: 28px !important;
+							height: 28px !important;
 							border-radius: 6px !important;
 							transition: all 0.15s ease !important;
 
 							&:hover {
 								background: var(--accentSoft) !important;
+								box-shadow: 0 0 8px var(--glowSoft) !important;
 								.ql-stroke { stroke: var(--toolbarIconHover) !important; }
 								.ql-fill { fill: var(--toolbarIconHover) !important; }
 							}
 						}
 
-						.ql-stroke {
-							stroke: var(--toolbarIcon) !important;
-							transition: stroke 0.15s ease;
-						}
-						.ql-fill {
-							fill: var(--toolbarIcon) !important;
-							transition: fill 0.15s ease;
-						}
+						.ql-stroke { stroke: var(--toolbarIcon) !important; transition: stroke 0.15s; }
+						.ql-fill { fill: var(--toolbarIcon) !important; transition: fill 0.15s; }
+
 						.ql-picker-label {
 							color: var(--toolbarIcon) !important;
 							border-radius: 6px !important;
 							border-color: var(--border) !important;
-
 							.ql-stroke { stroke: var(--toolbarIcon) !important; }
 						}
+
 						.ql-active {
 							.ql-stroke { stroke: var(--accent) !important; }
 							.ql-fill { fill: var(--accent) !important; }
 						}
-						.ql-active,
-						button.ql-active {
+						.ql-active, button.ql-active {
 							background: var(--accentSoft) !important;
 							color: var(--accent) !important;
+							box-shadow: 0 0 8px var(--glowSoft) !important;
 						}
 					}
 
@@ -658,11 +710,11 @@
 						padding: 0 !important;
 						background: var(--surface) !important;
 						border: 1px solid var(--borderStrong) !important;
-						box-shadow: 0 8px 30px var(--shadowMedium) !important;
+						box-shadow: 0 8px 30px var(--shadowMedium), 0 0 1px var(--borderStrong) !important;
 
 						> span {
 							min-width: 150px;
-							padding: 8px 16px !important;
+							padding: 7px 14px !important;
 							background: var(--surface) !important;
 							border-bottom: 1px solid var(--border) !important;
 							border-left: none !important;
@@ -670,7 +722,7 @@
 							border-top: none !important;
 							color: var(--textPrimary) !important;
 							font-size: 13px !important;
-							font-family: 'Source Sans 3', sans-serif !important;
+							font-family: 'DM Sans', sans-serif !important;
 							cursor: pointer;
 							transition: all 0.1s ease;
 
@@ -678,11 +730,6 @@
 								background: var(--accentSoft) !important;
 								color: var(--accent) !important;
 							}
-							&:active {
-								background: var(--accent) !important;
-								color: white !important;
-							}
-
 							&:first-of-type {
 								border-top-left-radius: $radius - 1 !important;
 								border-top-right-radius: $radius - 1 !important;
@@ -711,20 +758,30 @@
 
 					.ql-editor {
 						padding: 24px 32px;
-						font-family: 'Source Sans 3', sans-serif;
-						font-size: 15.5px;
-						line-height: 1.75;
+						font-family: 'DM Sans', sans-serif;
+						font-size: 15px;
+						line-height: 1.8;
 						color: var(--textPrimary);
 						min-height: 100%;
 
 						&.ql-blank::before {
 							color: var(--textMuted);
 							font-style: italic;
-							font-family: 'Cormorant Garamond', Georgia, serif;
+							font-family: 'DM Sans', sans-serif;
 						}
 					}
 				}
 			}
 		}
+	}
+
+	@keyframes cornerGlow {
+		0%, 100% { opacity: 0.6; transform: translate(0, 0); }
+		50% { opacity: 1; transform: translate(-20px, 20px); }
+	}
+
+	@keyframes indicatorPulse {
+		0%, 100% { opacity: 0.4; }
+		50% { opacity: 1; }
 	}
 </style>
