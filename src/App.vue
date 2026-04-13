@@ -6,11 +6,12 @@
 			<div class="shell-header">
 				<div class="header-brand">
 					<svg class="brand-icon" viewBox="0 0 80 100" fill="none">
-						<path d="M48 4L12 56H36L28 96L68 40H44L48 4Z" fill="url(#brandGrad)"/>
+						<path d="M48 4L12 56H36L28 96L68 40H44L48 4Z" fill="url(#brandGrad2)"/>
 						<defs>
-							<linearGradient id="brandGrad" x1="12" y1="4" x2="68" y2="96" gradientUnits="userSpaceOnUse">
-								<stop offset="0" stop-color="#00D4FF"/>
-								<stop offset="1" stop-color="#7B61FF"/>
+							<linearGradient id="brandGrad2" x1="12" y1="4" x2="68" y2="96" gradientUnits="userSpaceOnUse">
+								<stop offset="0" stop-color="#FFD93D"/>
+								<stop offset="0.5" stop-color="#FFAA00"/>
+								<stop offset="1" stop-color="#FF6B00"/>
 							</linearGradient>
 						</defs>
 					</svg>
@@ -323,86 +324,90 @@
 <style lang="scss">
 	@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap');
 
-	/* ===== DARK THEME (Voltage - Default) ===== */
+	/* ===== DARK THEME (Thunderstrike - Default) ===== */
 	.typemateApp {
-		--accent: #00D4FF;
-		--accentContrast: #0A0E1A;
-		--purple: #7B61FF;
-		--accentSoft: rgba(0, 212, 255, 0.08);
-		--accentBorder: rgba(0, 212, 255, 0.2);
-		--purpleSoft: rgba(123, 97, 255, 0.08);
-		--purpleBorder: rgba(123, 97, 255, 0.2);
-		--glowSoft: rgba(0, 212, 255, 0.1);
-		--glowMedium: rgba(0, 212, 255, 0.2);
-		--glowStrong: rgba(0, 212, 255, 0.35);
-		--shadowLight: rgba(0, 0, 0, 0.2);
-		--shadowMedium: rgba(0, 0, 0, 0.4);
+		--accent: #FFAA00;
+		--accentContrast: #0B1120;
+		--accentHot: #FF6B00;
+		--accentLight: #FFD93D;
+		--purple: #FF8C00;
+		--accentSoft: rgba(255, 170, 0, 0.08);
+		--accentBorder: rgba(255, 170, 0, 0.2);
+		--purpleSoft: rgba(255, 140, 0, 0.08);
+		--purpleBorder: rgba(255, 140, 0, 0.2);
+		--glowSoft: rgba(255, 170, 0, 0.1);
+		--glowMedium: rgba(255, 170, 0, 0.2);
+		--glowStrong: rgba(255, 170, 0, 0.35);
+		--shadowLight: rgba(0, 0, 0, 0.25);
+		--shadowMedium: rgba(0, 0, 0, 0.45);
 
-		--bg: #0A0E1A;
-		--surface: #111827;
-		--surfaceElevated: #151C2E;
-		--splashBg: #0A0E1A;
+		--bg: #0B1120;
+		--surface: #111A2E;
+		--surfaceElevated: #162036;
+		--splashBg: #0B1120;
 
-		--textPrimary: #E8ECF4;
-		--textSecondary: #94A3B8;
-		--textMuted: #4B5B73;
+		--textPrimary: #EAE6DF;
+		--textSecondary: #8E99AD;
+		--textMuted: #4A5568;
 
-		--border: rgba(148, 163, 184, 0.1);
-		--borderStrong: rgba(148, 163, 184, 0.15);
+		--border: rgba(234, 230, 223, 0.08);
+		--borderStrong: rgba(234, 230, 223, 0.12);
 
-		--toolbarBg: #111827;
-		--toolbarIcon: #64748B;
-		--toolbarIconHover: #00D4FF;
+		--toolbarBg: #111A2E;
+		--toolbarIcon: #5E6B82;
+		--toolbarIconHover: #FFAA00;
 
-		--editorBg: #0D1221;
-		--analyticsBar: #0F1525;
+		--editorBg: #0D1526;
+		--analyticsBar: #0F1729;
 
-		--success: #00DC82;
-		--successSoft: rgba(0, 220, 130, 0.08);
-		--successBorder: rgba(0, 220, 130, 0.2);
-		--warning: #FFB800;
-		--warningSoft: rgba(255, 184, 0, 0.08);
-		--error: #FF4B4B;
-		--errorSoft: rgba(255, 75, 75, 0.06);
-		--errorBorder: rgba(255, 75, 75, 0.15);
+		--success: #34D399;
+		--successSoft: rgba(52, 211, 153, 0.08);
+		--successBorder: rgba(52, 211, 153, 0.2);
+		--warning: #FFAA00;
+		--warningSoft: rgba(255, 170, 0, 0.08);
+		--error: #F87171;
+		--errorSoft: rgba(248, 113, 113, 0.06);
+		--errorBorder: rgba(248, 113, 113, 0.15);
 
-		--headerBg: #111827;
-		--headerBorder: rgba(0, 212, 255, 0.08);
+		--headerBg: #111A2E;
+		--headerBorder: rgba(255, 170, 0, 0.1);
 	}
 
-	/* ===== LIGHT THEME (Voltage Light) ===== */
+	/* ===== LIGHT THEME (Thunderstrike Light) ===== */
 	.typemateApp:not(.dark) {
-		--accent: #0891B2;
+		--accent: #D97706;
 		--accentContrast: #FFFFFF;
-		--purple: #6D28D9;
-		--accentSoft: rgba(8, 145, 178, 0.06);
-		--accentBorder: rgba(8, 145, 178, 0.2);
-		--purpleSoft: rgba(109, 40, 217, 0.06);
-		--purpleBorder: rgba(109, 40, 217, 0.2);
-		--glowSoft: rgba(8, 145, 178, 0.08);
-		--glowMedium: rgba(8, 145, 178, 0.12);
-		--glowStrong: rgba(8, 145, 178, 0.2);
+		--accentHot: #C2410C;
+		--accentLight: #F59E0B;
+		--purple: #EA580C;
+		--accentSoft: rgba(217, 119, 6, 0.06);
+		--accentBorder: rgba(217, 119, 6, 0.2);
+		--purpleSoft: rgba(234, 88, 12, 0.06);
+		--purpleBorder: rgba(234, 88, 12, 0.2);
+		--glowSoft: rgba(217, 119, 6, 0.06);
+		--glowMedium: rgba(217, 119, 6, 0.1);
+		--glowStrong: rgba(217, 119, 6, 0.18);
 		--shadowLight: rgba(0, 0, 0, 0.05);
 		--shadowMedium: rgba(0, 0, 0, 0.08);
 
-		--bg: #F0F4F8;
-		--surface: #FFFFFF;
-		--surfaceElevated: #F7F9FC;
-		--splashBg: #F0F4F8;
+		--bg: #F5F1EB;
+		--surface: #FFFEFA;
+		--surfaceElevated: #F9F6F0;
+		--splashBg: #F5F1EB;
 
-		--textPrimary: #0F172A;
-		--textSecondary: #475569;
-		--textMuted: #94A3B8;
+		--textPrimary: #1C1917;
+		--textSecondary: #57534E;
+		--textMuted: #A8A29E;
 
-		--border: rgba(15, 23, 42, 0.08);
-		--borderStrong: rgba(15, 23, 42, 0.12);
+		--border: rgba(28, 25, 23, 0.08);
+		--borderStrong: rgba(28, 25, 23, 0.12);
 
-		--toolbarBg: #FFFFFF;
-		--toolbarIcon: #64748B;
-		--toolbarIconHover: #0891B2;
+		--toolbarBg: #FFFEFA;
+		--toolbarIcon: #78716C;
+		--toolbarIconHover: #D97706;
 
-		--editorBg: #FFFFFF;
-		--analyticsBar: #F7F9FC;
+		--editorBg: #FFFEFA;
+		--analyticsBar: #F9F6F0;
 
 		--success: #059669;
 		--successSoft: rgba(5, 150, 105, 0.06);
@@ -413,8 +418,8 @@
 		--errorSoft: rgba(220, 38, 38, 0.04);
 		--errorBorder: rgba(220, 38, 38, 0.12);
 
-		--headerBg: #FFFFFF;
-		--headerBorder: rgba(8, 145, 178, 0.08);
+		--headerBg: #FFFEFA;
+		--headerBorder: rgba(217, 119, 6, 0.1);
 	}
 
 	/* ===== BASE RESET ===== */
@@ -437,7 +442,7 @@
 	}
 
 	body {
-		background: #0A0E1A;
+		background: #0B1120;
 		transition: background 0.4s ease;
 	}
 
@@ -453,42 +458,42 @@
 		background: var(--bg);
 		transition: background 0.4s ease;
 
-		/* Grid pattern background */
+		/* Subtle vertical field lines */
 		&::before {
 			content: '';
 			position: absolute;
 			inset: 0;
 			background-image:
-				linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
-				linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
-			background-size: 40px 40px;
+				linear-gradient(rgba(255, 170, 0, 0.015) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(255, 170, 0, 0.015) 1px, transparent 1px);
+			background-size: 50px 50px;
 			pointer-events: none;
 			z-index: 0;
 		}
 
 		&:not(.dark)::before {
 			background-image:
-				linear-gradient(rgba(8, 145, 178, 0.03) 1px, transparent 1px),
-				linear-gradient(90deg, rgba(8, 145, 178, 0.03) 1px, transparent 1px);
+				linear-gradient(rgba(217, 119, 6, 0.02) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(217, 119, 6, 0.02) 1px, transparent 1px);
 		}
 
-		/* Corner glow effect */
+		/* Storm glow - top corner */
 		&::after {
 			content: '';
 			position: absolute;
-			width: 500px;
-			height: 500px;
+			width: 600px;
+			height: 400px;
 			border-radius: 50%;
-			background: radial-gradient(circle, rgba(0, 212, 255, 0.06), transparent 70%);
+			background: radial-gradient(ellipse, rgba(255, 170, 0, 0.05), rgba(255, 107, 0, 0.02) 40%, transparent 70%);
 			top: -200px;
-			right: -150px;
+			right: -100px;
 			pointer-events: none;
 			z-index: 0;
-			animation: cornerGlow 8s ease-in-out infinite;
+			animation: stormGlow 10s ease-in-out infinite;
 		}
 
 		&:not(.dark)::after {
-			background: radial-gradient(circle, rgba(8, 145, 178, 0.04), transparent 70%);
+			background: radial-gradient(ellipse, rgba(217, 119, 6, 0.04), transparent 70%);
 		}
 
 		/* ===== EDITOR SHELL ===== */
@@ -536,21 +541,20 @@
 					.brand-icon {
 						width: 20px;
 						height: 25px;
-						filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.3));
+						filter: drop-shadow(0 0 6px rgba(255, 170, 0, 0.35));
 					}
 
 					.brand-name {
-						font-family: 'Outfit', sans-serif;
-						font-size: 20px;
-						font-weight: 700;
+						font-family: 'Orbitron', sans-serif;
+						font-size: 17px;
+						font-weight: 800;
 						color: var(--textPrimary);
-						letter-spacing: 1px;
+						letter-spacing: 2.5px;
+						text-transform: uppercase;
 
 						.brand-accent {
-							background: linear-gradient(135deg, #00D4FF, #7B61FF);
-							-webkit-background-clip: text;
-							-webkit-text-fill-color: transparent;
-							background-clip: text;
+							color: #FFAA00;
+							text-shadow: 0 0 14px rgba(255, 170, 0, 0.35), 0 0 4px rgba(255, 170, 0, 0.2);
 						}
 					}
 				}
@@ -597,8 +601,8 @@
 						}
 
 						&.active .toggle-indicator {
-							background: var(--purple);
-							box-shadow: 0 0 8px rgba(123, 97, 255, 0.4);
+							background: var(--accentHot);
+							box-shadow: 0 0 8px rgba(255, 107, 0, 0.4);
 						}
 
 						&.loading {
@@ -775,9 +779,9 @@
 		}
 	}
 
-	@keyframes cornerGlow {
-		0%, 100% { opacity: 0.6; transform: translate(0, 0); }
-		50% { opacity: 1; transform: translate(-20px, 20px); }
+	@keyframes stormGlow {
+		0%, 100% { opacity: 0.5; transform: translate(0, 0) scale(1); }
+		50% { opacity: 1; transform: translate(-15px, 15px) scale(1.05); }
 	}
 
 	@keyframes indicatorPulse {
