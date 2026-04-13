@@ -727,33 +727,53 @@
 						background: var(--surface) !important;
 						border: 1px solid var(--borderStrong) !important;
 						box-shadow: 0 8px 30px var(--shadowMedium), 0 0 1px var(--borderStrong) !important;
+					}
 
-						> span {
-							min-width: 150px;
-							padding: 7px 14px !important;
-							background: var(--surface) !important;
-							border-bottom: 1px solid var(--border) !important;
-							border-left: none !important;
-							border-right: none !important;
-							border-top: none !important;
-							color: var(--textPrimary) !important;
-							font-size: 13px !important;
-							font-family: 'DM Sans', sans-serif !important;
+					.ql-picker:not(.ql-color-picker) .ql-picker-options > span {
+						min-width: 150px;
+						padding: 7px 14px !important;
+						background: var(--surface) !important;
+						border-bottom: 1px solid var(--border) !important;
+						border-left: none !important;
+						border-right: none !important;
+						border-top: none !important;
+						color: var(--textPrimary) !important;
+						font-size: 13px !important;
+						font-family: 'DM Sans', sans-serif !important;
+						cursor: pointer;
+						transition: all 0.1s ease;
+
+						&:hover {
+							background: var(--accentSoft) !important;
+							color: var(--accent) !important;
+						}
+						&:first-of-type {
+							border-top-left-radius: $radius - 1 !important;
+							border-top-right-radius: $radius - 1 !important;
+						}
+						&:last-of-type {
+							border-bottom-left-radius: $radius - 1 !important;
+							border-bottom-right-radius: $radius - 1 !important;
+							border-bottom: none !important;
+						}
+					}
+
+					.ql-color-picker .ql-picker-options {
+						padding: 4px 6px !important;
+
+						> span.ql-picker-item {
+							min-width: auto;
+							padding: 0 !important;
+							width: 18px;
+							height: 18px;
+							border-radius: 3px !important;
+							border: 1px solid var(--border) !important;
 							cursor: pointer;
 							transition: all 0.1s ease;
 
 							&:hover {
-								background: var(--accentSoft) !important;
-								color: var(--accent) !important;
-							}
-							&:first-of-type {
-								border-top-left-radius: $radius - 1 !important;
-								border-top-right-radius: $radius - 1 !important;
-							}
-							&:last-of-type {
-								border-bottom-left-radius: $radius - 1 !important;
-								border-bottom-right-radius: $radius - 1 !important;
-								border-bottom: none !important;
+								border-color: var(--accent) !important;
+								box-shadow: 0 0 4px var(--glowSoft);
 							}
 						}
 					}
