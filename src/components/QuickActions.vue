@@ -35,6 +35,21 @@
 			</div>
 		</div>
 
+		<div class="output-length-row">
+			<span class="group-label">Output</span>
+			<div class="slider-wrap">
+				<input type="range" class="length-slider" min="0" max="3"
+					:value="lengthIndex" @input="onSliderInput($event)">
+				<div class="slider-labels">
+					<span v-for="(l, i) in lengthLevels" :key="l.value"
+						class="slider-label" :class="{ active: i === lengthIndex }"
+						@click="setLength(i)">
+						{{ l.label }}
+					</span>
+				</div>
+			</div>
+		</div>
+
 		<div v-if="loading" class="loading-indicator">
 			<div class="loading-bar">
 				<div class="loading-bar-fill"></div>
@@ -82,14 +97,32 @@
 					{ label: 'Formal', value: 'formal' },
 					{ label: 'Casual', value: 'casual' },
 					{ label: 'Academic', value: 'academic' },
-					{ label: 'Creative', value: 'creative' }
+					{ label: 'Creative', value: 'creative' },
+					{ label: 'Developer', value: 'developer' }
 				],
 				actions: [
 					{ label: 'Concise', value: 'concise' },
 					{ label: 'Professional', value: 'professional' },
 					{ label: 'Simplify', value: 'simplify' },
 					{ label: 'Expand', value: 'expand' }
-				]
+				],
+				lengthLevels: [
+					{ label: 'Brief', value: 'brief' },
+					{ label: 'Medium', value: 'medium' },
+					{ label: 'Detailed', value: 'detailed' },
+					{ label: 'Extensive', value: 'extensive' }
+				],
+				lengthIndex: 1
+			}
+		},
+		methods: {
+			onSliderInput (e) {
+				this.lengthIndex = parseInt(e.target.value)
+				this.$emit('length-change', this.lengthLevels[this.lengthIndex].value)
+			},
+			setLength (i) {
+				this.lengthIndex = i
+				this.$emit('length-change', this.lengthLevels[this.lengthIndex].value)
 			}
 		},
 		computed: {
@@ -200,6 +233,104 @@
 			&:hover:not(:disabled) {
 				background: var(--purpleSoft);
 				box-shadow: 0 0 12px rgba(123, 97, 255, 0.15);
+			}
+		}
+	}
+
+	.output-length-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-top: 10px;
+		padding: 8px 0 2px;
+
+		.group-label {
+			font-family: 'Outfit', sans-serif;
+			font-size: 10px;
+			font-weight: 700;
+			color: var(--accent);
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			flex-shrink: 0;
+		}
+
+		.slider-wrap {
+			flex: 1;
+			max-width: 320px;
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+
+			.length-slider {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 100%;
+				height: 4px;
+				border-radius: 4px;
+				background: var(--border);
+				outline: none;
+				cursor: pointer;
+				transition: background 0.2s;
+
+				&::-webkit-slider-thumb {
+					-webkit-appearance: none;
+					appearance: none;
+					width: 16px;
+					height: 16px;
+					border-radius: 50%;
+					background: var(--accent);
+					box-shadow: 0 0 10px var(--glowMedium), 0 0 3px var(--glowSoft);
+					cursor: pointer;
+					transition: all 0.2s ease;
+					border: 2px solid var(--surface);
+				}
+
+				&::-webkit-slider-thumb:hover {
+					transform: scale(1.2);
+					box-shadow: 0 0 16px var(--glowMedium), 0 0 6px var(--glowSoft);
+				}
+
+				&::-moz-range-thumb {
+					width: 16px;
+					height: 16px;
+					border-radius: 50%;
+					background: var(--accent);
+					box-shadow: 0 0 10px var(--glowMedium);
+					cursor: pointer;
+					border: 2px solid var(--surface);
+				}
+
+				&::-moz-range-track {
+					height: 4px;
+					border-radius: 4px;
+					background: var(--border);
+				}
+			}
+
+			.slider-labels {
+				display: flex;
+				justify-content: space-between;
+
+				.slider-label {
+					font-family: 'DM Sans', sans-serif;
+					font-size: 10px;
+					font-weight: 500;
+					color: var(--textMuted);
+					cursor: pointer;
+					padding: 2px 4px;
+					border-radius: 4px;
+					transition: all 0.2s ease;
+
+					&:hover {
+						color: var(--textSecondary);
+					}
+
+					&.active {
+						color: var(--accent);
+						font-weight: 700;
+						text-shadow: 0 0 8px var(--glowSoft);
+					}
+				}
 			}
 		}
 	}

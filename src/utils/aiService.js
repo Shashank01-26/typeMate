@@ -106,36 +106,59 @@ async function callGroq (messages, maxTokens = 512) {
   return data.choices[0]?.message?.content || ''
 }
 
+// --- Output Length Presets ---
+
+const LENGTH_PRESETS = {
+  brief: { maxTokens: 256, guidance: 'Keep the output very brief and concise — shortest form possible while preserving meaning.' },
+  medium: { maxTokens: 512, guidance: '' },
+  detailed: { maxTokens: 1024, guidance: 'Provide a thorough and detailed output with full explanations and supporting context.' },
+  extensive: { maxTokens: 2048, guidance: 'Provide a comprehensive, in-depth output. Expand on all points, include nuance, examples, and thorough coverage.' }
+}
+
+function getLengthConfig (lengthLevel) {
+  return LENGTH_PRESETS[lengthLevel] || LENGTH_PRESETS.medium
+}
+
 // --- AI Feature Functions ---
 
-export async function changeTone (text, tone) {
+export async function changeTone (text, tone, lengthLevel = 'medium') {
+  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+
   const toneDescriptions = {
-    formal: 'Rewrite this text in a formal, professional tone. Use proper grammar, avoid contractions, and maintain a business-appropriate style.',
-    casual: 'Rewrite this text in a casual, friendly tone. Use natural language, contractions are fine, keep it conversational.',
-    academic: 'Rewrite this text in an academic tone. Use precise vocabulary, formal structure, and scholarly phrasing.',
-    creative: 'Rewrite this text in a creative, engaging tone. Use vivid language, varied sentence structure, and expressive phrasing.'
+    formal: 'Rewrite the following text in a formal, professional tone. Use proper grammar, avoid contractions, and ensure a business-appropriate register throughout.',
+    casual: 'Rewrite the following text in a casual, conversational tone. Use natural everyday language, contractions are encouraged, and keep the voice friendly and approachable.',
+    academic: 'Rewrite the following text in an academic tone. Use precise domain-appropriate vocabulary, maintain formal sentence structure, and employ scholarly phrasing with measured objectivity.',
+    creative: 'Rewrite the following text in a creative, expressive tone. Use vivid imagery, varied sentence rhythm, and engaging word choices to bring the writing to life.',
+    developer: 'Rewrite the following text from a software developer\'s perspective. Prioritize technical precision, conciseness, and unambiguity. Structure the content for clear root cause analysis, debugging context, and actionable observations. Use direct language, eliminate fluff, and preserve all technical details, constraints, and edge cases. Format for easy scanning — short paragraphs, logical flow from problem to cause to resolution.'
   }
 
-  const prompt = toneDescriptions[tone] || `Rewrite this text in a ${tone} tone.`
+  const prompt = toneDescriptions[tone] || `Rewrite the following text in a ${tone} tone.`
+  const lengthHint = guidance ? ` ${guidance}` : ''
 
   return callGroq([
-    { role: 'system', content: 'You are a writing assistant. Return ONLY the rewritten text, no explanations or labels.' },
+    { role: 'system', content: `You are an expert writing assistant specialized in tone adaptation. Output ONLY the rewritten text. Do not include labels, explanations, preambles, or commentary.${lengthHint}` },
     { role: 'user', content: `${prompt}\n\nText:\n${text}` }
-  ], 1024)
+  ], maxTokens)
 }
 
-export async function improveGrammar (text) {
+export async function improveGrammar (text, lengthLevel = 'medium') {
+  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+  const lengthHint = guidance ? ` ${guidance}` : ''
+
   return callGroq([
-    { role: 'system', content: 'You are a grammar and clarity expert. Fix grammar, spelling, punctuation, and improve clarity. Return ONLY the corrected text, no explanations.' },
-    { role: 'user', content: `Fix grammar and improve clarity:\n\n${text}` }
-  ], 1024)
+    { role: 'system', content: `You are an expert editor specializing in grammar, spelling, punctuation, and clarity. Correct all errors and improve sentence flow while preserving the original meaning and voice. Output ONLY the corrected text. Do not include explanations, annotations, or change summaries.${lengthHint}` },
+    { role: 'user', content: `Correct grammar, spelling, and punctuation, and improve clarity in the following text:\n\n${text}` }
+  ], maxTokens)
 }
 
-export async function getContextSuggestions (text) {
+export async function getContextSuggestions (text, lengthLevel = 'medium') {
+  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+  const lengthHint = guidance ? ` ${guidance}` : ''
+
   const result = await callGroq([
-    { role: 'system', content: 'You are a writing assistant. Based on the text provided, suggest 3 possible ways to continue or improve it. Return each suggestion on a new line, prefixed with a number (1. 2. 3.). Keep each suggestion under 50 words.' },
-    { role: 'user', content: `Suggest continuations or improvements for:\n\n${text}` }
-  ], 512)
+    { role: 'system', content: `You are a context-aware writing assistant. Analyze the provided text and generate exactly 3 distinct suggestions: possible continuations, refinements, or next directions the writing could take. Format: one suggestion per line, numbered (1. 2. 3.). Each suggestion must be under 50 words. Do not include any other text, headers, or commentary.${lengthHint}` },
+    { role: 'user', content: `Based on the following text, suggest 3 ways to continue or improve it:\n\n${text}` }
+  ], maxTokens)
 
   return result
     .split('\n')
@@ -144,20 +167,23 @@ export async function getContextSuggestions (text) {
     .filter(s => s.length > 0)
 }
 
-export async function quickAction (text, action) {
+export async function quickAction (text, action, lengthLevel = 'medium') {
+  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+
   const actions = {
-    concise: 'Make this text more concise. Remove unnecessary words and redundancy while keeping the core meaning. Return ONLY the rewritten text.',
-    professional: 'Rewrite this text to sound more professional and polished. Return ONLY the rewritten text.',
-    simplify: 'Simplify this text. Use shorter sentences, simpler words, and make it easier to understand. Return ONLY the rewritten text.',
-    expand: 'Expand this text with more detail and supporting points while maintaining the original meaning. Return ONLY the expanded text.'
+    concise: 'Make the following text more concise. Eliminate redundancy, filler words, and unnecessary qualifiers while preserving the core meaning and key details.',
+    professional: 'Rewrite the following text to sound polished and professional. Use confident, clear language appropriate for a business or workplace context.',
+    simplify: 'Simplify the following text for maximum readability. Use shorter sentences, common vocabulary, and straightforward structure. Aim for easy comprehension without losing important meaning.',
+    expand: 'Expand the following text with additional detail, supporting points, and context. Maintain the original meaning and tone while enriching the content.'
   }
 
-  const instruction = actions[action] || `${action}. Return ONLY the modified text.`
+  const instruction = actions[action] || `${action}.`
+  const lengthHint = guidance ? ` ${guidance}` : ''
 
   return callGroq([
-    { role: 'system', content: 'You are a writing assistant. Follow the instruction precisely. Return ONLY the modified text, no explanations.' },
+    { role: 'system', content: `You are a precise writing assistant. Execute the given instruction exactly as specified. Output ONLY the modified text. Do not include explanations, labels, preambles, or commentary.${lengthHint}` },
     { role: 'user', content: `${instruction}\n\nText:\n${text}` }
-  ], 1024)
+  ], maxTokens)
 }
 
 // --- Writing Analytics (local, no API call) ---

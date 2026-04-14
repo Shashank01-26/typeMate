@@ -55,6 +55,7 @@
 				@get-suggestions="handleGetSuggestions"
 				@apply-suggestion="handleApplySuggestion"
 				@clear-error="aiError = ''"
+				@length-change="v => outputLength = v"
 			/>
 
 			<!-- Analytics footer -->
@@ -119,6 +120,7 @@
 			aiSuggestions: [],
 			aiUsage: null,
 			activeTone: '',
+			outputLength: 'medium',
 			writingStats: {
 				wordCount: 0,
 				charCount: 0,
@@ -266,7 +268,7 @@
 				this.aiError = ''
 				this.activeTone = tone
 				try {
-					const result = await changeTone(ctx.text, tone)
+					const result = await changeTone(ctx.text, tone, this.outputLength)
 					this.replaceText(result, ctx.selection)
 				} catch (e) {
 					this.aiError = e.message
@@ -282,7 +284,7 @@
 				this.aiLoadingMessage = `Making text ${action}...`
 				this.aiError = ''
 				try {
-					const result = await quickAction(ctx.text, action)
+					const result = await quickAction(ctx.text, action, this.outputLength)
 					this.replaceText(result, ctx.selection)
 				} catch (e) {
 					this.aiError = e.message
@@ -298,7 +300,7 @@
 				this.aiLoadingMessage = 'Fixing grammar & improving clarity...'
 				this.aiError = ''
 				try {
-					const result = await improveGrammar(ctx.text)
+					const result = await improveGrammar(ctx.text, this.outputLength)
 					this.replaceText(result, ctx.selection)
 				} catch (e) {
 					this.aiError = e.message
@@ -314,7 +316,7 @@
 				this.aiLoadingMessage = 'Getting AI suggestions...'
 				this.aiError = ''
 				try {
-					this.aiSuggestions = await getContextSuggestions(ctx.text)
+					this.aiSuggestions = await getContextSuggestions(ctx.text, this.outputLength)
 				} catch (e) {
 					this.aiError = e.message
 				} finally {
