@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Build Vue app
-        run: ELECTRON_BUILD=true vue-cli-service build --mode production
+        run: ELECTRON_BUILD=true npx vue-cli-service build --mode production
         env:
           VUE_APP_GROQ_API_KEY: ${{ secrets.VUE_APP_GROQ_API_KEY }}
 
