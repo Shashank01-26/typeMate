@@ -128,7 +128,16 @@ export async function changeTone (text, tone, lengthLevel = 'medium', customProm
     return callGroq([
       {
         role: 'system',
-        content: `${customPrompt}\n\nReturn ONLY the refined text. No explanations, headings, or commentary.`
+        content: `You are a text refinement assistant. Refine the user's input using the style instruction below, while strictly preserving its original meaning and intent.
+
+Style instruction: ${customPrompt}
+
+Rules:
+- Do NOT answer the user's input. Only refine it.
+- Do NOT add new information, assumptions, continuations, or extra sentences.
+- Preserve the original meaning exactly. No reinterpretation.
+- Keep the output the same length as the input. Do not expand it.
+- Return ONLY the refined text. No explanations, labels, or commentary.`
       },
       { role: 'user', content: text }
     ], maxTokens)

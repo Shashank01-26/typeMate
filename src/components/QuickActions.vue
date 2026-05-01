@@ -131,7 +131,7 @@
 			setLength (i) {
 				this.lengthIndex = i
 				this.$emit('length-change', this.lengthLevels[this.lengthIndex].value)
-			},
+			}
 		},
 		computed: {
 			usagePercent () {
