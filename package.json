@@ -1,14 +1,35 @@
 {
-  "name": "smart-compose",
+  "name": "typemate",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "electron:build": "ELECTRON_BUILD=true vue-cli-service build --mode production && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.typemate.app",
+    "productName": "TypeMate",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/main.js"
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "public/img/icons/android-chrome-512x512.png",
+      "category": "public.app-category.productivity"
+    },
+    "dmg": {
+      "title": "TypeMate"
+    }
   },
   "dependencies": {
     "core-js": "^3.8.3",
