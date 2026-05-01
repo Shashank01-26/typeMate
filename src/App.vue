@@ -2,6 +2,7 @@
 	<div :class="['typemateApp', { dark: isDark, 'electron-mode': isElectron }]">
 		<Logo v-show="appLoading" />
 		<div :class="['editorShell', { loading: appLoading }]">
+			<div v-if="isElectron" class="electron-drag-bar"></div>
 			<!-- Header bar -->
 			<div class="shell-header">
 				<div class="header-brand">
@@ -611,6 +612,11 @@
 				background: var(--headerBg);
 				border-bottom: 1px solid var(--headerBorder);
 				flex-shrink: 0;
+				-webkit-app-region: drag;
+
+				button, .modeToggle, a {
+					-webkit-app-region: no-drag;
+				}
 
 				.header-brand {
 					display: flex;
@@ -915,6 +921,14 @@
 			border-radius: 0;
 			border: none;
 			box-shadow: none;
+
+			.electron-drag-bar {
+				height: 28px;
+				flex-shrink: 0;
+				-webkit-app-region: drag;
+				background: var(--headerBg);
+				border-bottom: 1px solid var(--headerBorder);
+			}
 		}
 	}
 
