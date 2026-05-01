@@ -1,6 +1,7 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
+  publicPath: process.env.ELECTRON_BUILD ? './' : '/',
   pwa: {
     name: 'TypeMate',
     themeColor: '#0B1120',
