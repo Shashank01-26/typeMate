@@ -162,7 +162,7 @@
 			editor = app.$refs.vEditor.quill
 			let suggestionService
 
-			const res = await fetch('/sentences.json')
+			const res = await fetch('./sentences.json')
 			const sentences = await res.json()
 			this.sentences = sentences
 			this.suggestionLoading = false
