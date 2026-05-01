@@ -10,6 +10,16 @@
 					@click="$emit('change-tone', tone.value)">
 					{{ tone.label }}
 				</button>
+				<button class="action-btn tone-btn custom-tone-btn"
+					:class="{ active: activeTone === 'custom', 'has-prompt': !!customPrompt }"
+					:disabled="loading"
+					@click="handleCustomToneClick">
+					<svg class="custom-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M11.5 2.5a1.5 1.5 0 0 1 2.121 2.121L5.5 12.743 2 13.5l.757-3.5L11.5 2.5z"/>
+					</svg>
+					Custom
+					<span class="custom-edit-dot" v-if="customPrompt" @click.stop="openCustomEditor" title="Edit prompt">●</span>
+				</button>
 			</div>
 			<div class="divider"></div>
 			<div class="action-group">
@@ -32,6 +42,23 @@
 					@click="$emit('get-suggestions')">
 					Suggest
 				</button>
+			</div>
+		</div>
+
+		<div v-if="showCustomEditor" class="custom-prompt-editor">
+			<textarea
+				v-model="customDraft"
+				class="custom-prompt-input"
+				placeholder="Describe how you want your text refined… e.g. 'Rewrite in a warm, empathetic tone suitable for customer support emails.'"
+				rows="3"
+				@keydown.esc="showCustomEditor = false"
+			></textarea>
+			<div class="custom-prompt-footer">
+				<span class="custom-prompt-hint">This prompt replaces the system instruction for the Custom tone.</span>
+				<div class="custom-prompt-btns">
+					<button class="custom-cancel" @click="showCustomEditor = false">Cancel</button>
+					<button class="custom-save" @click="saveCustomPrompt" :disabled="!customDraft.trim()">Save</button>
+				</div>
 			</div>
 		</div>
 
@@ -93,6 +120,9 @@
 		},
 		data () {
 			return {
+				customPrompt: localStorage.getItem('typemate-custom-prompt') || '',
+				customDraft: '',
+				showCustomEditor: false,
 				tones: [
 					{ label: 'Formal', value: 'formal' },
 					{ label: 'Casual', value: 'casual' },
@@ -123,6 +153,27 @@
 			setLength (i) {
 				this.lengthIndex = i
 				this.$emit('length-change', this.lengthLevels[this.lengthIndex].value)
+			},
+			handleCustomToneClick () {
+				if (!this.customPrompt) {
+					this.customDraft = ''
+					this.showCustomEditor = true
+				} else {
+					this.$emit('change-tone', 'custom')
+				}
+			},
+			openCustomEditor () {
+				this.customDraft = this.customPrompt
+				this.showCustomEditor = true
+			},
+			saveCustomPrompt () {
+				const prompt = this.customDraft.trim()
+				if (!prompt) return
+				this.customPrompt = prompt
+				localStorage.setItem('typemate-custom-prompt', prompt)
+				this.$emit('update-custom-prompt', prompt)
+				this.showCustomEditor = false
+				this.$emit('change-tone', 'custom')
 			}
 		},
 		computed: {
@@ -216,6 +267,47 @@
 			color: var(--accentContrast);
 			border-color: var(--accent);
 			box-shadow: 0 0 16px var(--glowMedium), inset 0 0 8px rgba(255,255,255,0.1);
+		}
+
+		&.custom-tone-btn {
+			border-style: dashed;
+			border-color: var(--purpleBorder);
+			color: var(--purple);
+			display: flex;
+			align-items: center;
+			gap: 5px;
+
+			.custom-icon {
+				width: 11px;
+				height: 11px;
+				flex-shrink: 0;
+				opacity: 0.8;
+			}
+
+			.custom-edit-dot {
+				font-size: 8px;
+				line-height: 1;
+				opacity: 0.6;
+				cursor: pointer;
+				margin-left: 1px;
+				transition: opacity 0.2s;
+				&:hover { opacity: 1; }
+			}
+
+			&:hover:not(:disabled) {
+				background: var(--purpleSoft);
+				border-color: var(--purple);
+				color: var(--purple);
+				box-shadow: 0 0 12px rgba(123, 97, 255, 0.15);
+			}
+
+			&.active {
+				background: var(--purple);
+				border-color: var(--purple);
+				border-style: solid;
+				color: var(--accentContrast);
+				box-shadow: 0 0 16px var(--purpleSoft);
+			}
 		}
 
 		&.grammar-btn {
@@ -469,6 +561,84 @@
 				&.normal { background: var(--success); box-shadow: 0 0 6px rgba(0, 220, 130, 0.3); }
 				&.warning { background: var(--warning); box-shadow: 0 0 6px rgba(255, 184, 0, 0.3); }
 				&.critical { background: var(--error); box-shadow: 0 0 6px rgba(255, 75, 75, 0.3); }
+			}
+		}
+	}
+
+	.custom-prompt-editor {
+		margin-top: 10px;
+		padding: 10px 12px;
+		background: var(--surface);
+		border: 1px dashed var(--purpleBorder);
+		border-radius: 10px;
+
+		.custom-prompt-input {
+			width: 100%;
+			background: var(--surfaceElevated);
+			border: 1px solid var(--border);
+			border-radius: 7px;
+			color: var(--textPrimary);
+			font-family: 'DM Sans', sans-serif;
+			font-size: 12.5px;
+			line-height: 1.6;
+			padding: 8px 10px;
+			resize: vertical;
+			outline: none;
+			box-sizing: border-box;
+			transition: border-color 0.2s;
+
+			&:focus {
+				border-color: var(--purple);
+				box-shadow: 0 0 0 2px var(--purpleSoft);
+			}
+
+			&::placeholder { color: var(--textMuted); }
+		}
+
+		.custom-prompt-footer {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-top: 8px;
+			gap: 10px;
+
+			.custom-prompt-hint {
+				font-family: 'DM Sans', sans-serif;
+				font-size: 10.5px;
+				color: var(--textMuted);
+				flex: 1;
+			}
+
+			.custom-prompt-btns {
+				display: flex;
+				gap: 6px;
+				flex-shrink: 0;
+
+				button {
+					padding: 4px 12px;
+					border-radius: 6px;
+					font-family: 'DM Sans', sans-serif;
+					font-size: 12px;
+					font-weight: 500;
+					cursor: pointer;
+					transition: all 0.2s;
+					border: 1px solid transparent;
+				}
+
+				.custom-cancel {
+					background: transparent;
+					border-color: var(--border);
+					color: var(--textSecondary);
+					&:hover { border-color: var(--textMuted); color: var(--textPrimary); }
+				}
+
+				.custom-save {
+					background: var(--purple);
+					color: var(--accentContrast);
+					border-color: var(--purple);
+					&:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 10px var(--purpleSoft); }
+					&:disabled { opacity: 0.4; cursor: not-allowed; }
+				}
 			}
 		}
 	}
