@@ -50,6 +50,7 @@
 				:usage="aiUsage"
 				:activeTone="activeTone"
 				@change-tone="handleChangeTone"
+				@update-custom-prompt="p => customTonePrompt = p"
 				@quick-action="handleQuickAction"
 				@improve-grammar="handleImproveGrammar"
 				@get-suggestions="handleGetSuggestions"
@@ -121,6 +122,7 @@
 			aiUsage: null,
 			activeTone: '',
 			outputLength: 'medium',
+			customTonePrompt: localStorage.getItem('typemate-custom-prompt') || '',
 			writingStats: {
 				wordCount: 0,
 				charCount: 0,
@@ -269,7 +271,7 @@
 				this.aiError = ''
 				this.activeTone = tone
 				try {
-					const result = await changeTone(ctx.text, tone, this.outputLength)
+					const result = await changeTone(ctx.text, tone, this.outputLength, this.customTonePrompt)
 					this.replaceText(result, ctx.selection)
 				} catch (e) {
 					this.aiError = e.message
