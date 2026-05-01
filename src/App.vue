@@ -19,6 +19,12 @@
 					<span class="brand-name">Type<span class="brand-accent">Mate</span></span>
 				</div>
 				<div class="header-controls">
+					<a v-if="!isElectron" class="download-mac-btn" href="https://github.com/Shashank01-26/typeMate/releases/latest/download/TypeMate-arm64.dmg" download title="Download TypeMate for macOS">
+						<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M8 2v8M5 7l3 3 3-3"/><rect x="2" y="11" width="12" height="3" rx="1"/>
+						</svg>
+						Mac App
+					</a>
 					<button class="edit-prompt-btn" @click="openCustomPromptModal" :title="customTonePrompt ? 'Edit custom prompt' : 'Set custom prompt'">
 						<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
 							<path d="M11.5 2.5a1.5 1.5 0 0 1 2.121 2.121L5.5 12.743 2 13.5l.757-3.5L11.5 2.5z"/>
@@ -649,7 +655,39 @@
 					align-items: center;
 					gap: 10px;
 
-					.edit-prompt-btn {
+					.download-mac-btn {
+						display: flex;
+						align-items: center;
+						gap: 5px;
+						padding: 5px 12px;
+						background: var(--successSoft);
+						border: 1px solid var(--successBorder);
+						border-radius: 8px;
+						color: var(--success);
+						font-family: 'DM Sans', sans-serif;
+						font-size: 11.5px;
+						font-weight: 600;
+						cursor: pointer;
+						text-decoration: none;
+						transition: all 0.2s ease;
+						-webkit-app-region: no-drag;
+
+						svg {
+							width: 13px;
+							height: 13px;
+							flex-shrink: 0;
+						}
+
+						&:hover {
+							background: var(--success);
+							color: #fff;
+							border-color: var(--success);
+							box-shadow: 0 0 14px rgba(52, 211, 153, 0.25);
+							transform: translateY(-1px);
+						}
+					}
+
+				.edit-prompt-btn {
 						display: flex;
 						align-items: center;
 						gap: 5px;

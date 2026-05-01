@@ -28,7 +28,8 @@
       "category": "public.app-category.productivity"
     },
     "dmg": {
-      "title": "TypeMate"
+      "title": "TypeMate",
+      "artifactName": "TypeMate-arm64.dmg"
     }
   },
   "dependencies": {
