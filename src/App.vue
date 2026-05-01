@@ -251,10 +251,11 @@
 				return text ? { text, selection: { index: 0, length: editor.getLength() - 1 } } : null
 			},
 			replaceText: function (newText, selection) {
+				const cleaned = newText.replace(/^"+|"+$/g, '').trim()
 				if (selection) {
 					editor.deleteText(selection.index, selection.length)
-					editor.insertText(selection.index, newText)
-					editor.setSelection(selection.index, newText.length)
+					editor.insertText(selection.index, cleaned)
+					editor.setSelection(selection.index, cleaned.length)
 				}
 			},
 			updateUsage: function () {
