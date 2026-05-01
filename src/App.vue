@@ -1,5 +1,5 @@
 <template>
-	<div :class="['typemateApp', { dark: isDark }]">
+	<div :class="['typemateApp', { dark: isDark, 'electron-mode': isElectron }]">
 		<Logo v-show="appLoading" />
 		<div :class="['editorShell', { loading: appLoading }]">
 			<!-- Header bar -->
@@ -18,6 +18,12 @@
 					<span class="brand-name">Type<span class="brand-accent">Mate</span></span>
 				</div>
 				<div class="header-controls">
+					<button class="edit-prompt-btn" @click="openCustomPromptModal" :title="customTonePrompt ? 'Edit custom prompt' : 'Set custom prompt'">
+						<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M11.5 2.5a1.5 1.5 0 0 1 2.121 2.121L5.5 12.743 2 13.5l.757-3.5L11.5 2.5z"/>
+						</svg>
+						Edit Prompt
+					</button>
 					<div :class="['modeToggle', { active: suggestionMode === 'word' }, { loading: suggestionLoading }]"
 						@click="toggleSuggestionMode">
 						<span class="toggle-indicator"></span>
@@ -49,8 +55,9 @@
 				:aiSuggestions="aiSuggestions"
 				:usage="aiUsage"
 				:activeTone="activeTone"
+				:customPrompt="customTonePrompt"
 				@change-tone="handleChangeTone"
-				@update-custom-prompt="p => customTonePrompt = p"
+				@open-custom-modal="openCustomPromptModal"
 				@quick-action="handleQuickAction"
 				@improve-grammar="handleImproveGrammar"
 				@get-suggestions="handleGetSuggestions"
@@ -65,6 +72,36 @@
 
 		<SuggestionOverlay :suggestions=suggestions :activeSuggestion=activeEditorState.suggestion
 			:suggestionRect=suggestionRect :updateActiveSuggestion=updateActiveSuggestion />
+
+		<!-- Custom Prompt Modal -->
+		<transition name="modal-fade">
+			<div v-if="showCustomPromptModal" class="custom-modal-overlay" @click.self="showCustomPromptModal = false">
+				<div class="custom-modal">
+					<div class="custom-modal-header">
+						<span class="custom-modal-title">Custom Tone Prompt</span>
+						<button class="custom-modal-close" @click="showCustomPromptModal = false">
+							<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+								<line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/>
+							</svg>
+						</button>
+					</div>
+					<div class="custom-modal-body">
+						<textarea
+							v-model="customPromptDraft"
+							class="custom-modal-textarea"
+							placeholder="Describe how you want your text refined…&#10;&#10;e.g. 'Rewrite in a warm, empathetic tone suitable for customer support emails. Keep responses concise and avoid technical jargon.'"
+							rows="6"
+							@keydown.esc="showCustomPromptModal = false"
+						></textarea>
+						<p class="custom-modal-hint">This becomes the system instruction for the <strong>Custom</strong> tone. The AI will follow it exactly when refining your text.</p>
+					</div>
+					<div class="custom-modal-footer">
+						<button class="modal-btn cancel" @click="showCustomPromptModal = false">Cancel</button>
+						<button class="modal-btn save" @click="saveCustomPrompt" :disabled="!customPromptDraft.trim()">Save & Apply</button>
+					</div>
+				</div>
+			</div>
+		</transition>
 	</div>
 </template>
 
@@ -120,9 +157,12 @@
 			aiError: '',
 			aiSuggestions: [],
 			aiUsage: null,
+			isElectron: typeof window !== 'undefined' && window.navigator.userAgent.includes('Electron'),
 			activeTone: '',
 			outputLength: 'medium',
 			customTonePrompt: localStorage.getItem('typemate-custom-prompt') || '',
+			showCustomPromptModal: false,
+			customPromptDraft: '',
 			writingStats: {
 				wordCount: 0,
 				charCount: 0,
@@ -147,7 +187,7 @@
 				[{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
 				[{ indent: '-1' }, { indent: '+1' }],
 				[{ color: [] }, { background: [] }],
-				['link', 'image', 'video'],
+				['image', 'video'],
 				['clean']
 			]
 		}),
@@ -160,7 +200,13 @@
 			}
 			this.updateFavicon()
 
-			setTimeout(() => (app.appLoading = false), 2800)
+			const storage = this.isElectron ? localStorage : sessionStorage
+			if (storage.getItem('typemate-loaded')) {
+				app.appLoading = false
+			} else {
+				storage.setItem('typemate-loaded', '1')
+				setTimeout(() => (app.appLoading = false), 2800)
+			}
 			editor = app.$refs.vEditor.quill
 			let suggestionService
 
@@ -206,6 +252,18 @@
 			}
 		},
 		methods: {
+			openCustomPromptModal: function () {
+				this.customPromptDraft = this.customTonePrompt
+				this.showCustomPromptModal = true
+			},
+			saveCustomPrompt: function () {
+				const prompt = this.customPromptDraft.trim()
+				if (!prompt) return
+				this.customTonePrompt = prompt
+				localStorage.setItem('typemate-custom-prompt', prompt)
+				this.showCustomPromptModal = false
+				this.handleChangeTone('custom')
+			},
 			toggleTheme: function () {
 				this.isDark = !this.isDark
 				localStorage.setItem('typemate-theme', this.isDark ? 'dark' : 'light')
@@ -264,6 +322,10 @@
 				this.aiUsage = getUsageStats()
 			},
 			handleChangeTone: async function (tone) {
+				if (tone === 'custom' && !this.customTonePrompt) {
+					this.aiError = 'No custom prompt set. Use the Edit Prompt button to add one.'
+					return
+				}
 				const ctx = this.getSelectedText()
 				if (!ctx) { this.aiError = 'No text to transform. Start writing first!'; return }
 				this.aiLoading = true
@@ -581,6 +643,34 @@
 					align-items: center;
 					gap: 10px;
 
+					.edit-prompt-btn {
+						display: flex;
+						align-items: center;
+						gap: 5px;
+						padding: 5px 11px;
+						background: var(--surfaceElevated);
+						border: 1px dashed var(--purpleBorder);
+						border-radius: 8px;
+						color: var(--purple);
+						font-family: 'DM Sans', sans-serif;
+						font-size: 11.5px;
+						font-weight: 500;
+						cursor: pointer;
+						transition: all 0.2s ease;
+
+						svg {
+							width: 11px;
+							height: 11px;
+							flex-shrink: 0;
+						}
+
+						&:hover {
+							background: var(--purpleSoft);
+							border-color: var(--purple);
+							box-shadow: 0 0 10px rgba(123, 97, 255, 0.12);
+						}
+					}
+
 					.modeToggle {
 						position: relative;
 						padding: 5px 16px 5px 24px;
@@ -814,6 +904,161 @@
 				}
 			}
 		}
+	}
+
+	/* ===== ELECTRON FULL-PAGE MODE ===== */
+	.typemateApp.electron-mode {
+		.editorShell {
+			width: 100%;
+			max-width: 100%;
+			height: 100%;
+			border-radius: 0;
+			border: none;
+			box-shadow: none;
+		}
+	}
+
+	/* ===== CUSTOM PROMPT MODAL ===== */
+	.custom-modal-overlay {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.65);
+		backdrop-filter: blur(4px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+		padding: 24px;
+	}
+
+	.custom-modal {
+		width: 100%;
+		max-width: 520px;
+		background: var(--surface);
+		border: 1px solid var(--purpleBorder);
+		border-radius: 14px;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--purpleBorder);
+		overflow: hidden;
+
+		.custom-modal-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 14px 18px;
+			border-bottom: 1px solid var(--border);
+
+			.custom-modal-title {
+				font-family: 'Outfit', sans-serif;
+				font-size: 14px;
+				font-weight: 700;
+				color: var(--textPrimary);
+				letter-spacing: 0.5px;
+			}
+
+			.custom-modal-close {
+				width: 28px;
+				height: 28px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: 7px;
+				cursor: pointer;
+				color: var(--textMuted);
+				transition: all 0.2s;
+
+				svg { width: 13px; height: 13px; }
+
+				&:hover {
+					background: var(--errorSoft);
+					border-color: var(--errorBorder);
+					color: var(--error);
+				}
+			}
+		}
+
+		.custom-modal-body {
+			padding: 16px 18px;
+
+			.custom-modal-textarea {
+				width: 100%;
+				background: var(--surfaceElevated);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				color: var(--textPrimary);
+				font-family: 'DM Sans', sans-serif;
+				font-size: 13px;
+				line-height: 1.65;
+				padding: 10px 12px;
+				resize: vertical;
+				outline: none;
+				box-sizing: border-box;
+				transition: border-color 0.2s, box-shadow 0.2s;
+
+				&:focus {
+					border-color: var(--purple);
+					box-shadow: 0 0 0 3px var(--purpleSoft);
+				}
+
+				&::placeholder { color: var(--textMuted); }
+			}
+
+			.custom-modal-hint {
+				margin-top: 8px;
+				font-family: 'DM Sans', sans-serif;
+				font-size: 11px;
+				color: var(--textMuted);
+				line-height: 1.5;
+
+				strong { color: var(--purple); font-weight: 600; }
+			}
+		}
+
+		.custom-modal-footer {
+			display: flex;
+			justify-content: flex-end;
+			gap: 8px;
+			padding: 12px 18px;
+			border-top: 1px solid var(--border);
+
+			.modal-btn {
+				padding: 6px 16px;
+				border-radius: 8px;
+				font-family: 'DM Sans', sans-serif;
+				font-size: 13px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s;
+				border: 1px solid transparent;
+
+				&.cancel {
+					background: transparent;
+					border-color: var(--border);
+					color: var(--textSecondary);
+					&:hover { border-color: var(--textMuted); color: var(--textPrimary); }
+				}
+
+				&.save {
+					background: var(--purple);
+					color: var(--accentContrast);
+					&:hover:not(:disabled) {
+						filter: brightness(1.1);
+						box-shadow: 0 0 14px var(--purpleSoft);
+					}
+					&:disabled { opacity: 0.4; cursor: not-allowed; }
+				}
+			}
+		}
+	}
+
+	.modal-fade-enter-active, .modal-fade-leave-active {
+		transition: opacity 0.2s ease;
+		.custom-modal { transition: transform 0.2s ease, opacity 0.2s ease; }
+	}
+	.modal-fade-enter, .modal-fade-leave-to {
+		opacity: 0;
+		.custom-modal { transform: scale(0.96); opacity: 0; }
 	}
 
 	@keyframes stormGlow {
