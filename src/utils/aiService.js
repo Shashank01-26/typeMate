@@ -90,7 +90,7 @@ async function callGroq (messages, maxTokens = 512) {
       model: MODEL,
       messages,
       max_tokens: maxTokens,
-      temperature: 0.7
+      temperature: 0.2
     })
   })
 
@@ -109,10 +109,10 @@ async function callGroq (messages, maxTokens = 512) {
 // --- Output Length Presets ---
 
 const LENGTH_PRESETS = {
-  brief: { maxTokens: 256, guidance: 'Keep the output very brief and concise — shortest form possible while preserving meaning.' },
+  basic: { maxTokens: 256, guidance: 'Keep the output minimal — only the essential correction or change, nothing more.' },
   medium: { maxTokens: 512, guidance: '' },
-  detailed: { maxTokens: 1024, guidance: 'Provide a thorough and detailed output with full explanations and supporting context.' },
-  extensive: { maxTokens: 2048, guidance: 'Provide a comprehensive, in-depth output. Expand on all points, include nuance, examples, and thorough coverage.' }
+  brief: { maxTokens: 384, guidance: 'Keep the output concise and to the point while preserving all key meaning.' },
+  detailed: { maxTokens: 1024, guidance: 'Provide a thorough output with full context and supporting detail.' }
 }
 
 function getLengthConfig (lengthLevel) {
@@ -122,32 +122,62 @@ function getLengthConfig (lengthLevel) {
 // --- AI Feature Functions ---
 
 export async function changeTone (text, tone, lengthLevel = 'medium') {
-  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+  const { maxTokens } = getLengthConfig(lengthLevel)
 
   const toneDescriptions = {
-    formal: 'Rewrite the following text in a formal, professional tone. Use proper grammar, avoid contractions, and ensure a business-appropriate register throughout.',
-    casual: 'Rewrite the following text in a casual, conversational tone. Use natural everyday language, contractions are encouraged, and keep the voice friendly and approachable.',
-    academic: 'Rewrite the following text in an academic tone. Use precise domain-appropriate vocabulary, maintain formal sentence structure, and employ scholarly phrasing with measured objectivity.',
-    creative: 'Rewrite the following text in a creative, expressive tone. Use vivid imagery, varied sentence rhythm, and engaging word choices to bring the writing to life.',
-    developer: 'Rewrite the following text from a software developer\'s perspective. Prioritize technical precision, conciseness, and unambiguity. Structure the content for clear root cause analysis, debugging context, and actionable observations. Use direct language, eliminate fluff, and preserve all technical details, constraints, and edge cases. Format for easy scanning — short paragraphs, logical flow from problem to cause to resolution.'
+    formal: 'formal and professional',
+    casual: 'casual and conversational',
+    academic: 'academic and scholarly',
+    creative: 'creative and expressive',
+    developer: 'technically precise and developer-focused — direct, unambiguous, with clear logical flow'
   }
 
-  const prompt = toneDescriptions[tone] || `Rewrite the following text in a ${tone} tone.`
-  const lengthHint = guidance ? ` ${guidance}` : ''
+  const toneLabel = toneDescriptions[tone] || tone
 
   return callGroq([
-    { role: 'system', content: `You are an expert writing assistant specialized in tone adaptation. Output ONLY the rewritten text. Do not include labels, explanations, preambles, or commentary.${lengthHint}` },
-    { role: 'user', content: `${prompt}\n\nText:\n${text}` }
+    {
+      role: 'system',
+      content: `You are a text refinement assistant. Your only task is to improve the user's input based on the selected tone, while strictly preserving its original meaning and intent.
+
+Rules:
+- Do NOT answer the user's input. Only refine it.
+- Do NOT add new information, assumptions, or context.
+- Preserve the original meaning exactly. No reinterpretation.
+- Keep the output concise and close to the original length.
+- Avoid over-polishing or making the text sound unnatural.
+- Maintain the original structure as much as possible.
+- Do not expand short inputs into long outputs.
+- If the input is already clear, return it with minimal or no changes.
+- Apply only subtle tone adjustments. Do not exaggerate tone or dramatically change wording.
+- Return ONLY the refined text. No explanations, headings, or commentary.`
+    },
+    {
+      role: 'user',
+      content: `Tone: ${toneLabel}\nInput: ${text}`
+    }
   ], maxTokens)
 }
 
 export async function improveGrammar (text, lengthLevel = 'medium') {
-  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
-  const lengthHint = guidance ? ` ${guidance}` : ''
+  const { maxTokens } = getLengthConfig(lengthLevel)
 
   return callGroq([
-    { role: 'system', content: `You are an expert editor specializing in grammar, spelling, punctuation, and clarity. Correct all errors and improve sentence flow while preserving the original meaning and voice. Output ONLY the corrected text. Do not include explanations, annotations, or change summaries.${lengthHint}` },
-    { role: 'user', content: `Correct grammar, spelling, and punctuation, and improve clarity in the following text:\n\n${text}` }
+    {
+      role: 'system',
+      content: `You are a grammar correction assistant. Fix grammar, spelling, and punctuation errors in the user's input while preserving the original meaning, voice, and structure.
+
+Rules:
+- Return ONLY the corrected text as a single output. No lists, no variants, no options.
+- Do not answer or respond to the input — only correct it.
+- Do not add, remove, or reinterpret content.
+- Do not include explanations, annotations, or change summaries.
+- Keep the output the same length and structure as the input.
+- If the input has no errors, return it unchanged.`
+    },
+    {
+      role: 'user',
+      content: text
+    }
   ], maxTokens)
 }
 

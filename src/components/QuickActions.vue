@@ -107,10 +107,10 @@
 					{ label: 'Expand', value: 'expand' }
 				],
 				lengthLevels: [
-					{ label: 'Brief', value: 'brief' },
+					{ label: 'Basic', value: 'basic' },
 					{ label: 'Medium', value: 'medium' },
-					{ label: 'Detailed', value: 'detailed' },
-					{ label: 'Extensive', value: 'extensive' }
+					{ label: 'Brief', value: 'brief' },
+					{ label: 'Detailed', value: 'detailed' }
 				],
 				lengthIndex: 1
 			}
