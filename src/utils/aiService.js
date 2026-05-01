@@ -121,8 +121,18 @@ function getLengthConfig (lengthLevel) {
 
 // --- AI Feature Functions ---
 
-export async function changeTone (text, tone, lengthLevel = 'medium') {
+export async function changeTone (text, tone, lengthLevel = 'medium', customPrompt = '') {
   const { maxTokens } = getLengthConfig(lengthLevel)
+
+  if (tone === 'custom') {
+    return callGroq([
+      {
+        role: 'system',
+        content: `${customPrompt}\n\nReturn ONLY the refined text. No explanations, headings, or commentary.`
+      },
+      { role: 'user', content: text }
+    ], maxTokens)
+  }
 
   const toneDescriptions = {
     formal: 'formal and professional',
