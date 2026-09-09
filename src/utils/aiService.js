@@ -123,7 +123,8 @@ function getLengthConfig (lengthLevel) {
 // --- AI Feature Functions ---
 
 export async function changeTone (text, tone, lengthLevel = 'medium', customPrompt = '') {
-  const { maxTokens } = getLengthConfig(lengthLevel)
+  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+  const lengthHint = guidance ? ` ${guidance}` : ''
 
   if (tone === 'custom') {
     return callGroq([
@@ -137,8 +138,7 @@ Rules:
 - Do NOT answer the user's input. Only refine it.
 - Do NOT add new information, assumptions, continuations, or extra sentences.
 - Preserve the original meaning exactly. No reinterpretation.
-- Keep the output the same length as the input. Do not expand it.
-- Return ONLY the refined text. No explanations, labels, or commentary.`
+- Return ONLY the refined text. No explanations, labels, or commentary.${lengthHint}`
       },
       { role: 'user', content: text }
     ], maxTokens)
@@ -163,13 +163,11 @@ Rules:
 - Do NOT answer the user's input. Only refine it.
 - Do NOT add new information, assumptions, or context.
 - Preserve the original meaning exactly. No reinterpretation.
-- Keep the output concise and close to the original length.
 - Avoid over-polishing or making the text sound unnatural.
 - Maintain the original structure as much as possible.
-- Do not expand short inputs into long outputs.
 - If the input is already clear, return it with minimal or no changes.
 - Apply only subtle tone adjustments. Do not exaggerate tone or dramatically change wording.
-- Return ONLY the refined text. No explanations, headings, or commentary.`
+- Return ONLY the refined text. No explanations, headings, or commentary.${lengthHint}`
     },
     {
       role: 'user',
@@ -179,7 +177,8 @@ Rules:
 }
 
 export async function improveGrammar (text, lengthLevel = 'medium') {
-  const { maxTokens } = getLengthConfig(lengthLevel)
+  const { maxTokens, guidance } = getLengthConfig(lengthLevel)
+  const lengthHint = guidance ? ` ${guidance}` : ''
 
   return callGroq([
     {
@@ -191,8 +190,7 @@ Rules:
 - Do not answer or respond to the input — only correct it.
 - Do not add, remove, or reinterpret content.
 - Do not include explanations, annotations, or change summaries.
-- Keep the output the same length and structure as the input.
-- If the input has no errors, return it unchanged.`
+- If the input has no errors, return it unchanged.${lengthHint}`
     },
     {
       role: 'user',
