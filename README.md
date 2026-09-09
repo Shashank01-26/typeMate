@@ -143,7 +143,7 @@ The suggestion engine picks up your input in real time:
 
 ## API Usage & Rate Limits
 
-TypeMate uses the [Groq API](https://console.groq.com/) with the `llama-3.1-8b-instant` model.
+TypeMate uses the [Groq API](https://console.groq.com/) with the `qwen/qwen3.6-27b` model.
 
 Built-in rate limiting stays within Groq's free tier:
 - Max **25 requests/minute**

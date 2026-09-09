@@ -1,5 +1,5 @@
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const MODEL = 'llama-3.1-8b-instant'
+const MODEL = 'qwen/qwen3.6-27b'
 
 // --- Rate Limiting & Usage Tracking ---
 
@@ -90,7 +90,8 @@ async function callGroq (messages, maxTokens = 512) {
       model: MODEL,
       messages,
       max_tokens: maxTokens,
-      temperature: 0.2
+      temperature: 0.2,
+      reasoning_effort: 'none'
     })
   })
 
